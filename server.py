@@ -44,10 +44,15 @@ class SimpleResponder(WebSocket):
     def handleClose(self):
         print(self.address, 'closed')
 
+
+def close_sig_handler(signal, frame):
+    server.close()
+    sys.exit()
+
 if __name__ == "__main__":
     parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
     parser.add_option("--host", default='localhost', type='string', action="store", dest="host", help="hostname (localhost)")
-    parser.add_option("--port", default=8000, type='int', action="store", dest="port", help="port (8000)")
+    parser.add_option("--port", default=PORT, type='int', action="store", dest="port", help="port (8000)")
     parser.add_option("--ssl", default=0, type='int', action="store", dest="ssl", help="ssl (1: on, 0: off (default))")
     parser.add_option("--cert", default='./cert.pem', type='string', action="store", dest="cert", help="cert (./cert.pem)")
     parser.add_option("--key", default='./key.pem', type='string', action="store", dest="key", help="key (./key.pem)")
@@ -55,7 +60,7 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    print("Initialisation du serveur")
+
     l_configuration = Configuration()
     name = "configuration"
     if l_configuration.has_conf_directory(name) is False:
@@ -69,17 +74,15 @@ if __name__ == "__main__":
         l_configuration.create_conf_directory(name)
 
     cls = SimpleResponder
+    print("Initialisation du serveur")
     if options.ssl == 1:
         server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.key, version=options.ver)
     else:
         server = SimpleWebSocketServer(options.host, options.port, cls)
 
-
-def close_sig_handler(signal, frame):
-    server.close()
-    sys.exit()
+    signal.signal(signal.SIGINT, close_sig_handler)
+    server.serveforever()
 
 
-signal.signal(signal.SIGINT, close_sig_handler)
 
-server.serveforever()
+
