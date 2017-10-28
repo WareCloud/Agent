@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# title				: directory.py
+# title				: Configuration.py
 # description		: class to manage configuration
 # author			: Cloquet Alban
 # date				: 2017/08/20
 # version			: Python 3.6
-# usage				: python directory.py
+# usage				: python Configuration.py
 # notes				: 
 # python_version	: 3.6
 # ==============================================================================
@@ -21,10 +21,13 @@ from logging.handlers import RotatingFileHandler
 class Configuration:
 
     def __init__(self):
+        """Setup configuration"""
         self.files = [f for f in os.listdir('.')]
         self.current = os.getcwd()
         self.WINDOWS = 'Windows'
         self.LINUX = "Linux"
+
+        """logger init"""
         self.logger = logging.getLogger()
         self.logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
@@ -36,13 +39,13 @@ class Configuration:
         stream_handler.setLevel(logging.DEBUG)
         self.logger.addHandler(stream_handler)
 
-    def has_conf_directory(self, name):
+    def has_directory(self, name):
         for f in self.files:
             if f == name:
                 return True
         return False
 
-    def has_soft_files(self, name):
+    def has_files(self, name):
         os.chdir(name)
         files = [f for f in os.listdir('.')]
         for f in files:
@@ -52,16 +55,16 @@ class Configuration:
         os.chdir("..")
         return False
 
-    def create_conf_directory(self, name):
+    def create_directory(self, name):
         try:
             os.makedirs(name)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
 
-    def create_soft_files(self, name):
+    def create_files(self, name):
         try:
-            open("software", 'a').close()
+            open(name, 'a').close()
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise

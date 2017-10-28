@@ -9,41 +9,27 @@
 # python_version	: 3.6
 # ==============================================================================
 
-# Import the modules needed to run the script.
-import asyncio
-import websockets
+# ////////////////////////////////////////////////////////////////////////////////
+# //
+# //  WARECLOUD
+# //
+# ////////////////////////////////////////////////////////////////////////////////
 
-from Models import Command
-from directory import Configuration
-import ssl
+# Import the modules needed to run the script.
+
 import signal
+import ssl
 import sys
-from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from optparse import OptionParser
 
+from SimpleWebSocketServer import SimpleWebSocketServer, SimpleSSLWebSocketServer
 
-HOST = ''
+from Models.Configuration import Configuration
+from Models.SimpleResponder import SimpleResponder
+
 PORT = 8000
-ERROR = "WrongCommand"
-OK = "OK"
-
-clients = []
-class SimpleResponder(WebSocket):
-
-    def handleMessage(self):
-        for client in clients:
-            print(self.data)
-            l_command_handler = Command.Command(self.data)
-            if l_command_handler.is_valid_command() is True:
-                client.sendMessage(self.address[0] + u' - ' + OK)
-
-    def handleConnected(self):
-        print(self.address, 'connected')
-        clients.append(self)
-
-    def handleClose(self):
-        print(self.address, 'closed')
-
+CONFIGURATION = "configuration"
+INSTALL = "install"
 
 def close_sig_handler(signal, frame):
     server.close()
@@ -57,24 +43,23 @@ if __name__ == "__main__":
     parser.add_option("--cert", default='./cert.pem', type='string', action="store", dest="cert", help="cert (./cert.pem)")
     parser.add_option("--key", default='./key.pem', type='string', action="store", dest="key", help="key (./key.pem)")
     parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
+    parser.add_option("--debug", default=True, type=bool, action="store", dest="debug", help="debug option")
 
     (options, args) = parser.parse_args()
 
-
+    """ Configuration de l'agent """
     l_configuration = Configuration()
-    name = "configuration"
-    if l_configuration.has_conf_directory(name) is False:
-        l_configuration.create_conf_directory(name)
+    if l_configuration.has_directory(CONFIGURATION) is False:
+        l_configuration.create_directory(CONFIGURATION)
 
-    if l_configuration.has_soft_files(name) is False:
-        l_configuration.create_conf_directory(name)
+    if l_configuration.has_files(CONFIGURATION) is False:
+        l_configuration.create_directory(CONFIGURATION)
 
-    name = "install"
-    if l_configuration.has_conf_directory(name) is False:
-        l_configuration.create_conf_directory(name)
+    if l_configuration.has_directory(INSTALL) is False:
+        l_configuration.create_directory(INSTALL)
 
+    """ Lancement du serveur """
     cls = SimpleResponder
-    print("Initialisation du serveur")
     if options.ssl == 1:
         server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.key, version=options.ver)
     else:
