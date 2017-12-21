@@ -15,7 +15,6 @@ import threading
 name = "FirefoxInstaller"
 threads = []
 
-
 class Installer:
 
     def __int__(self, p_name):
