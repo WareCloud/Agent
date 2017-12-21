@@ -28,11 +28,12 @@ def on_close(ws):
     print("### closed ###")
 
 
+lol = []
 def on_open(ws):
     def run(*args):
-        for i in range(30000):
-            time.sleep(10)
-            ws.send("download URL NAME")#"Hello %d" % i)
+        for i in lol:
+            time.sleep(1)
+            ws.send(i)
         time.sleep(1)
         ws.close()
         print("thread terminating...")
@@ -41,6 +42,9 @@ def on_open(ws):
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
+    lol.append("error URL NAME")
+    lol.append("yolo URL NAME")
+    lol.append("download URL NAME")
     ws = websocket.WebSocketApp("ws://127.0.0.1:8000",
                                 on_message=on_message,
                                 on_error=on_error,

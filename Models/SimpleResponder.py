@@ -18,7 +18,10 @@
 # Import the modules needed to run the script.
 
 from SimpleWebSocketServer import WebSocket
+
 from Models import Command
+from Models.Packet import Enum
+from Models.Packet import PacketId, PacketError
 
 clients = []
 
@@ -26,17 +29,23 @@ clients = []
 class SimpleResponder(WebSocket):
 
     def handleMessage(self):
-        for client in clients:
-            print("Receive: " + self.data)
-            l_command_handler = Command.Command(self.data)
-            if l_command_handler.is_valid_command() is True:
-                client.sendMessage(self.address[0] + u' - ')
-            else:
-                print(self.data + " is unknown")
+        l_command_handler = Command.Command(self.data)
+        print("CMSG: " + self.data)
+        if l_command_handler.is_valid_command() is True:
+            packet = str(self.address[0] + self.data)
+        else:
+            packet = PacketError(l_command_handler.m_command[0], Enum.UNKN_CMD).toJSON()
+            print("SMSG: " + Enum.UNKN_CMD + self.data)
+
+        clients[0].sendMessage(packet)
 
     def handleConnected(self):
         print(self.address, 'connected')
         clients.append(self)
+        packet = PacketId()
+        clients[0].sendMessage(packet.toJSON())
+
 
     def handleClose(self):
         print(self.address, 'closed')
+
