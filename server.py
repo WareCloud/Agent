@@ -52,19 +52,15 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     print(WARECLOUD)
-    """ Configuration de l'agent """
     if options.debug == 0:
         print(">> Configuration de l'agent ...")
 
     l_configuration = Configuration()
     if l_configuration.has_directory(CONFIGURATION) is False:
         l_configuration.create_directory(CONFIGURATION)
-
-    if l_configuration.has_files(CONFIGURATION) is False:
-        l_configuration.create_directory(CONFIGURATION)
-
     if l_configuration.has_directory(INSTALL) is False:
         l_configuration.create_directory(INSTALL)
+
 
     """ Lancement du serveur """
     if options.debug == 0:
@@ -77,6 +73,7 @@ if __name__ == "__main__":
         server = SimpleWebSocketServer(options.host, options.port, cls)
 
     signal.signal(signal.SIGINT, close_sig_handler)
+    print(">> Running on port :[", PORT ,"] ...")
     server.serveforever()
 
 

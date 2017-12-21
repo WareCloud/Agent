@@ -31,7 +31,7 @@ def on_close(ws):
 def on_open(ws):
     def run(*args):
         for i in range(30000):
-            time.sleep(1)
+            time.sleep(10)
             ws.send("download URL NAME")#"Hello %d" % i)
         time.sleep(1)
         ws.close()

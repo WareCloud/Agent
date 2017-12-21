@@ -31,6 +31,8 @@ class SimpleResponder(WebSocket):
             l_command_handler = Command.Command(self.data)
             if l_command_handler.is_valid_command() is True:
                 client.sendMessage(self.address[0] + u' - ')
+            else:
+                print(self.data + " is unknown")
 
     def handleConnected(self):
         print(self.address, 'connected')

@@ -58,6 +58,7 @@ class Configuration:
     def create_directory(self, name):
         try:
             os.makedirs(name)
+            print("Sucessfully created directory: ", name)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -65,6 +66,7 @@ class Configuration:
     def create_files(self, name):
         try:
             open(name, 'a').close()
+            print("Sucessfully created files: ", name)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -79,6 +81,7 @@ class Configuration:
 
         if os.stat("software").st_size != 0:
             self.logger.info('File already exist ')
+            print("Software file already exist:")
             return None
 
         import wmi
