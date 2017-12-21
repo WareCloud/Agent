@@ -30,6 +30,10 @@ from Models.SimpleResponder import SimpleResponder
 PORT = 8000
 CONFIGURATION = "configuration"
 INSTALL = "install"
+WARECLOUD = "///////////////////////////\n" \
+            "/////////WARECLOUD/////////\n" \
+            "///////////AGENT///////////\n" \
+            "///////////////////////////\n"
 
 def close_sig_handler(signal, frame):
     server.close()
@@ -43,11 +47,15 @@ if __name__ == "__main__":
     parser.add_option("--cert", default='./cert.pem', type='string', action="store", dest="cert", help="cert (./cert.pem)")
     parser.add_option("--key", default='./key.pem', type='string', action="store", dest="key", help="key (./key.pem)")
     parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
-    parser.add_option("--debug", default=True, type=bool, action="store", dest="debug", help="debug option")
+    parser.add_option("--debug", default=0, type='int', action="store", dest="debug", help="debug option")
 
     (options, args) = parser.parse_args()
 
+    print(WARECLOUD)
     """ Configuration de l'agent """
+    if options.debug == 0:
+        print(">> Configuration de l'agent ...")
+
     l_configuration = Configuration()
     if l_configuration.has_directory(CONFIGURATION) is False:
         l_configuration.create_directory(CONFIGURATION)
@@ -59,6 +67,9 @@ if __name__ == "__main__":
         l_configuration.create_directory(INSTALL)
 
     """ Lancement du serveur """
+    if options.debug == 0:
+        print(">> Lancement du serveur ...")
+
     cls = SimpleResponder
     if options.ssl == 1:
         server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.key, version=options.ver)

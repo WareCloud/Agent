@@ -27,7 +27,7 @@ class SimpleResponder(WebSocket):
 
     def handleMessage(self):
         for client in clients:
-            print(self.data)
+            print("Receive: " + self.data)
             l_command_handler = Command.Command(self.data)
             if l_command_handler.is_valid_command() is True:
                 client.sendMessage(self.address[0] + u' - ')
