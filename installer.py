@@ -8,7 +8,7 @@ import os
 import time
 import psutil
 import threading
-
+import subprocess
 
 threads = []
 
@@ -24,7 +24,8 @@ class Installer:
         self.name = p_name
 
     def install(self):
-        os.system("C:\\" + self.name)
+        installer = os.path.dirname(os.path.abspath(__file__)) + "\install\\" + self.name
+        subprocess.call([installer])
         return
 
     def follower(self):
