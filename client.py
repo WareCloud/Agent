@@ -31,9 +31,11 @@ def on_close(ws):
 lol = []
 def on_open(ws):
     def run(*args):
+        p = 1
         for i in lol:
-            time.sleep(1)
+            time.sleep(p)
             ws.send(i)
+            p += 3
         time.sleep(1)
         ws.close()
         print("thread terminating...")
@@ -43,8 +45,9 @@ def on_open(ws):
 if __name__ == "__main__":
     websocket.enableTrace(True)
     lol.append("error URL NAME")
-    lol.append("yolo URL NAME")
-    lol.append("download URL NAME")
+    lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe FirefoxInstaller")
+    lol.append("install FirefoxInstaller")
+    lol.append("follow FirefoxInstaller")
     ws = websocket.WebSocketApp("ws://127.0.0.1:8000",
                                 on_message=on_message,
                                 on_error=on_error,

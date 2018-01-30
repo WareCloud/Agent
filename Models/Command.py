@@ -1,10 +1,18 @@
 
 import platform
 import os
+from installer import *
 from parse import *
+import os
+import time
+import psutil
+import threading
 
 LINUX = "Linux"
 WINDOWS = "Windows"
+
+threads = []
+
 
 class Command:
 
@@ -12,23 +20,37 @@ class Command:
     def __init__(self, command):
         self.name = ""
         self.version = ""
-        self.m_command = str(command).split()
+        self.l_installer = Installer()
+
+        self.parsed_command = str(command).split()
+
         self.m_Commands = dict()
         self.m_Commands["install"] = self.install
-        self.m_Commands["configure"] = self.install
-        self.m_Commands["uninstall"] = self.install
-        self.m_Commands["update"] = self.install
+        self.m_Commands["follow"] = self.follow
+        self.m_Commands["configure"] = self.download
+        self.m_Commands["uninstall"] = self.download
+        self.m_Commands["update"] = self.download
         self.m_Commands["download"] = self.download
 
     def is_valid_command(self):
         for l_command in self.m_Commands:
-            if l_command == self.m_command[0]:
-                print(self.m_Commands)
-                return self.m_Commands[l_command](self.m_command[1], self.m_command[2])
+            if l_command == self.parsed_command[0]:
+                if l_command == "install":
+                    self.install(self.parsed_command[1], 0)
+                if l_command == "follow":
+                    self.follow()
+                if l_command == "download":
+                    self.download(self.parsed_command[1], self.parsed_command[2])
+                #self.m_Commands[l_command](self.parsed_command[1], self.parsed_command[2])
+                #print("#####COMMANDE TROUVER##### : " + l_command)
+                return True
 
         return False
 
-    def install(self):
+    def follow(self):
+        print("NO")#self.l_installer.follower())
+
+    def install(self, name, path):
         profile = ""
         if platform.system() == LINUX:
             os.system("apt-get update")
@@ -43,24 +65,17 @@ class Command:
                 f.truncate()
                 f.close()
 
-        elif platform.system() == WINDOWS:
-            os.system("C:\\Users\\cloqu\\Downloads\\Firefox.exe /S")
-            with open("C:\\Users\\cloqu\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini", "r+") as file:
-                for line in file:
-                    p = parse("{attr.type}={}", line)
-                    if p is not None and p['attr.type'] == "Path":
-                        line = 'Path=Profiles/xa6dylzk.clean\n'
-                    profile += line
-                file.seek(0)
-                file.write(profile)
-                file.truncate()
-                file.close()
-
-        return "OK"
+        self.l_installer.init(name)
+        t = threading.Thread(target=self.l_installer.install)
+        threads.append(t)
+        t.start()
+        return True
 
     def download(self, url, file_name):
         import urllib.request
 
         # Download the file from `url` and save it locally under `file_name`:
+
+        # https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe
         return urllib.request.urlretrieve(url, "install/" + file_name)
 

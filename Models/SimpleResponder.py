@@ -30,14 +30,13 @@ class SimpleResponder(WebSocket):
 
     def handleMessage(self):
         l_command_handler = Command.Command(self.data)
-        print("CMSG: " + self.data)
+        print("<< Client MSG: " + self.data)
         if l_command_handler.is_valid_command() is True:
-            packet = str(self.address[0] + self.data)
+            clients[0].sendMessage('{ "OK": OK }')
         else:
-            packet = PacketError(l_command_handler.m_command[0], Enum.UNKN_CMD).toJSON()
-            print("SMSG: " + Enum.UNKN_CMD + self.data)
-
-        clients[0].sendMessage(packet)
+            packet = PacketError(l_command_handler.parsed_command[0], Enum.UNKN_CMD).toJSON()
+            print(">> Server MSG: " + Enum.UNKN_CMD + self.data)
+            clients[0].sendMessage(packet)
 
     def handleConnected(self):
         print(self.address, 'connected')
