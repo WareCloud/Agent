@@ -28,14 +28,14 @@ class Installer:
         subprocess.call([installer])
         return
 
-    def follower(self):
+    def follower(self, name):
         time.sleep(5)
         list_pid = psutil.pids()
         print("Installer: FOLLOWING PROCESS")
         for x in list_pid:
             if psutil.pid_exists(x) is True:
                 p = psutil.Process(x)
-                if p.name() == self.name + '.exe':
+                if p.name() == name:
                     print("Found!")
                     process = p
         with process.oneshot():

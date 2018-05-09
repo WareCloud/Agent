@@ -79,10 +79,10 @@ class Configuration:
             self.logger.info(platform.system() + ' is not supported')
             return None
 
-        if os.stat("software").st_size != 0:
-            self.logger.info('File already exist ')
-            print("Software file already exist:")
-            return None
+       # if os.stat("software").st_size != 0:
+        #    self.logger.info('File already exist ')
+         #   print("Software file already exist:")
+      #      return None
 
         import wmi
         print("Software Initialisation")
@@ -93,6 +93,7 @@ class Configuration:
             soft.name = format(p.PackageName)
             soft.vendor = format(p.Vendor)
             soft.version = format(p.Version)
+            soft.location = format(p.InstallLocation)
             items.append(soft)
         var = Software.ContainerSoft(items)
         open("software", 'w').write(var.toJSON())

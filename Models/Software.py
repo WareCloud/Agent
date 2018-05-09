@@ -18,6 +18,6 @@ class Software:
         self.name = ""
         self.version = ""
         self.vendor = ""
-
+        self.location = ""
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

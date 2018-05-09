@@ -61,11 +61,11 @@ if __name__ == "__main__":
     if l_configuration.has_directory(INSTALL) is False:
         l_configuration.create_directory(INSTALL)
 
-
     """ Lancement du serveur """
     if options.debug == 0:
         print(">> Lancement du serveur ...")
 
+    l_configuration.get_all_software()
     cls = SimpleResponder
     if options.ssl == 1:
         server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.key, version=options.ver)

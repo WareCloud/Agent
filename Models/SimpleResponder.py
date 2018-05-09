@@ -22,19 +22,25 @@ from SimpleWebSocketServer import WebSocket
 from Models import Command
 from Models.Packet import Enum
 from Models.Packet import PacketId, PacketError
+import queue
+
 
 clients = []
 
 
 class SimpleResponder(WebSocket):
 
+    def init(self):
+        self.m_Command = Command.Command()
+
     def handleMessage(self):
-        l_command_handler = Command.Command(self.data)
+        self.m_Command.new_command(self.data)
         print("<< Client MSG: " + self.data)
-        if l_command_handler.is_valid_command() is True:
+        if self.m_Command.is_valid_command() is True:
+            self.m_Command.run()
             clients[0].sendMessage('{ "OK": OK }')
         else:
-            packet = PacketError(l_command_handler.parsed_command[0], Enum.UNKN_CMD).toJSON()
+            packet = PacketError(self.m_Command.parsed_command[0], Enum.UNKN_CMD).toJSON()
             print(">> Server MSG: " + Enum.UNKN_CMD + self.data)
             clients[0].sendMessage(packet)
 
