@@ -17,6 +17,7 @@
 
 from installer import *
 from Models.Packet import *
+from Models.eprint import eprint
 
 LINUX = "Linux"
 WINDOWS = "Windows"

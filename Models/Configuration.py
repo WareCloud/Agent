@@ -16,7 +16,7 @@ from Models import Software
 import platform
 import logging
 from logging.handlers import RotatingFileHandler
-
+from Models.eprint import eprint
 
 class Configuration:
 

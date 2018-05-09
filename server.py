@@ -35,6 +35,8 @@ WARECLOUD = "///////////////////////////\n" \
             "///////////AGENT///////////\n" \
             "///////////////////////////\n"
 
+debug = 0
+
 def close_sig_handler(signal, frame):
     server.close()
     sys.exit()

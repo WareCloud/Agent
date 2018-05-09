@@ -9,6 +9,7 @@ import time
 import psutil
 import threading
 import subprocess
+from Models.eprint import eprint
 
 threads = []
 
@@ -31,12 +32,12 @@ class Installer:
     def follower(self, name):
         statut = ""
         list_pid = psutil.pids()
-        print("Installer: FOLLOWING PROCESS")
+        eprint("Installer: FOLLOWING PROCESS")
         for x in list_pid:
             if psutil.pid_exists(x) is True:
                 p = psutil.Process(x)
                 if p.name() == name:
-                    print("Found!")
+                    eprint("Found!")
                     process = p
                     statut = process.status()
                     if str(statut) == "running":
