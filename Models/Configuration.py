@@ -74,6 +74,7 @@ class Configuration:
         self.get_all_software()
 
     def get_all_software(self):
+        return ""
         print(platform.system())
         if platform.system() != self.WINDOWS:
             self.logger.info(platform.system() + ' is not supported')

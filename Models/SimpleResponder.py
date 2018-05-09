@@ -26,21 +26,20 @@ import queue
 
 
 clients = []
+m_Command = Command.Command()
 
 
 class SimpleResponder(WebSocket):
 
-    def init(self):
-        self.m_Command = Command.Command()
-
     def handleMessage(self):
-        self.m_Command.new_command(self.data)
+        m_Command.new_command(self.data)
         print("<< Client MSG: " + self.data)
-        if self.m_Command.is_valid_command() is True:
-            self.m_Command.run()
-            clients[0].sendMessage('{ "OK": OK }')
+        if m_Command.is_valid_command() is True:
+            packet = m_Command.run()
+            print(">> Server MSG:", packet.type, packet.command)
+            clients[0].sendMessage(packet.toJSON())
         else:
-            packet = PacketError(self.m_Command.parsed_command[0], Enum.UNKN_CMD).toJSON()
+            packet = PacketError(m_Command.parsed_command[0], Enum.UNKN_CMD).toJSON()
             print(">> Server MSG: " + Enum.UNKN_CMD + self.data)
             clients[0].sendMessage(packet)
 
@@ -48,8 +47,8 @@ class SimpleResponder(WebSocket):
         print(self.address, 'connected')
         clients.append(self)
         packet = PacketId()
+        print(">> Server MSG: " + packet.toJSON())
         clients[0].sendMessage(packet.toJSON())
-
 
     def handleClose(self):
         print(self.address, 'closed')

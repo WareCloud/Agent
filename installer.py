@@ -20,7 +20,7 @@ class Installer:
         self.path = "./install"
 
     def init(self, p_name):
-        print("\n//////////////////\nInstaller: INITIALISATION\n//////////////////")
+        print("//////////////////\nInstaller: INITIALISATION\n//////////////////")
         self.name = p_name
 
     def install(self):
@@ -29,7 +29,7 @@ class Installer:
         return
 
     def follower(self, name):
-        time.sleep(5)
+        statut = ""
         list_pid = psutil.pids()
         print("Installer: FOLLOWING PROCESS")
         for x in list_pid:
@@ -38,8 +38,10 @@ class Installer:
                 if p.name() == name:
                     print("Found!")
                     process = p
-        with process.oneshot():
-           return process.name(), process.status()
+                    statut = process.status()
+                    if str(statut) == "running":
+                        return str(statut)
+        return statut
 
 # print(process.cpu_times())  # return cached value
 # print(process.cpu_percent())  # return cached value

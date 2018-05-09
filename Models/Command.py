@@ -15,9 +15,8 @@
 # //
 # ////////////////////////////////////////////////////////////////////////////////
 
-import threading
-
-from Models.installer import *
+from installer import *
+from Models.Packet import *
 
 LINUX = "Linux"
 WINDOWS = "Windows"
@@ -53,7 +52,7 @@ class Command:
     def new_command(self, command):
         self.parsed_command = str(command).split()
 
-
+    """  Check if the Command is valid """
     def is_valid_command(self):
         for l_command in self.m_Commands:
             if l_command == self.parsed_command[0]:
@@ -61,33 +60,41 @@ class Command:
 
         return False
 
+    """  Execute Command """
     def run(self):
             if self.parsed_command[0] == "install":
-                self.install(self.parsed_command[1], 0)
+                return self.install(self.parsed_command[1], 0)
             if self.parsed_command[0] == "follow":
-                self.l_installer.follower(self.parsed_command[1])
+                return self.follow(self.parsed_command[1])
             if self.parsed_command[0] == "download":
-                self.download(self.parsed_command[1], self.parsed_command[2])
+                return self.download(self.parsed_command[1], self.parsed_command[2])
             if self.parsed_command[0] == "configure":
-                self.configure(self.parsed_command[1], self.parsed_command[2])
+                return self.configure(self.parsed_command[1], self.parsed_command[2])
 
+    """  Follow Process """
     def follow(self, name):
-        name, status = self.l_installer.follower(name)
-        print(name, status)
-        return status == "running"
+        packet = ""
+        status = self.l_installer.follower(name)
+        if status == "running":
+            packet = PacketError(self.parsed_command[0], Enum.F_RUNNING)
+        else:
+            packet = PacketError(self.parsed_command[0], Enum.F_FINISH)
+        packet.id = Enum.PACKET_FOLLOW
+        return packet
 
+    """  Configuration Software """
     def configure(self, name, path):
-
         return True
 
+    """  Installation Software """
     def install(self, name, path):
-        print(name)
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.install)
         threads.append(t)
         t.start()
-        return True
+        return PacketError(self.parsed_command[0], Enum.OK_INSTALL)
 
+    """  Download Software """
     def download(self, url, file_name):
         import urllib.request
         # Download the file from `url` and save it locally under `file_name`:
