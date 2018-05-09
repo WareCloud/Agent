@@ -30,7 +30,7 @@ ConfigurationPath = "%AppData%/"
 Firefox = "Mozilla"
 TeamViewer = "TeamViewer"
 Slack = "Slack"
-Chrome = "C:\Users\Cloquet Alban\AppData\Local\Google\Chrome\User Data"
+Chrome = "C:\\Users\\Cloquet Alban\\AppData\\Local\\Google\\Chrome\\User Data"
 
 
 class Command:
