@@ -15,13 +15,9 @@
 # //
 # ////////////////////////////////////////////////////////////////////////////////
 
-import platform
-from installer import *
-import os
 import threading
-import queue
-from shutil import copyfile
 
+from Models.installer import *
 
 LINUX = "Linux"
 WINDOWS = "Windows"
