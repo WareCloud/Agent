@@ -22,6 +22,7 @@ from SimpleWebSocketServer import WebSocket
 from Models import Command
 from Models.Packet import Enum
 from Models.Packet import PacketId, PacketError
+import sys
 import queue
 
 
@@ -32,6 +33,7 @@ m_Command = Command.Command()
 class SimpleResponder(WebSocket):
 
     def handleMessage(self):
+        m_Command.set_websocket(self, clients[0])
         m_Command.new_command(self.data)
         print("<< Client MSG: " + self.data)
         if m_Command.is_valid_command() is True:
@@ -44,12 +46,15 @@ class SimpleResponder(WebSocket):
             clients[0].sendMessage(packet)
 
     def handleConnected(self):
+        import time
         print(self.address, 'connected')
         clients.append(self)
         packet = PacketId()
+        time.sleep(1)
         print(">> Server MSG: " + packet.toJSON())
         clients[0].sendMessage(packet.toJSON())
 
     def handleClose(self):
         print(self.address, 'closed')
+        clients.pop()
 

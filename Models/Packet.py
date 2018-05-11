@@ -5,13 +5,8 @@ import json
 
 from Models import Configuration
 
-class Enum:
 
-    PACKET_ID = 1
-    PACKET_FOLLOW = 2
-    PACKET_ERROR = 20
-
-
+class PacketType:
     UNKN_CMD = "UNKN_CMD:"
     UNKN_PATH = "UNKN_PATH:"
 
@@ -20,7 +15,6 @@ class Enum:
     F_ERROR = "CANT_FOUND"
 
     OK_INSTALL = "OK_INSTALL"
-
     OK_CONFIGURATION = "OK_CONFIGURATION"
     OK_UPDATE = "OK_UPDATE"
     OK_DOWNLOAD = "OK_DOWNLOAD"
@@ -32,6 +26,14 @@ class Enum:
     FAILED_FIND_INSTALLER = "FAILED_FIND_INSTALLER"
     FAILED_FIND_CONFIGURATION = "FAILED_FIND_CONFIGURATION"
     FAILED_FIND_DOWNLOAD = "FAILED_FIND_DOWNLOAD"
+
+
+class Enum:
+    PACKET_ID = 1
+    PACKET_INSTALL = 2
+    PACKET_FOLLOW = 3
+    PACKET_DOWNLOAD_STATE = 4
+    PACKET_ERROR = 20
 
 
 class PacketId:
@@ -50,8 +52,8 @@ class PacketId:
 
 class PacketError:
 
-    def __init__(self, cmd, type):
-        self.id = Enum.PACKET_ERROR
+    def __init__(self, cmd, type, id):
+        self.id = id
         self.command = cmd
         self.type = type
         self.path = os.path.dirname(os.path.abspath(__file__))
