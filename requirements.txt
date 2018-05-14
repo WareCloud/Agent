@@ -1,0 +1,3 @@
+websocket_server==0.4
+psutil==5.4.5
+

@@ -10,7 +10,8 @@ WareCloud: Agent (0.X)
 + parse ≥ 1.8+
 + psutil ≥ 5.3.0+
 
-SimpleWebSocketServer: https://github.com/dpallot/simple-websocket-server
+## Install requirements
+pip install -r requirements.txt
 
 ## Run
 
