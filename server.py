@@ -17,21 +17,15 @@
 
 # Import the modules needed to run the script.
 
-import signal
 import ssl
-import sys
+
 from optparse import OptionParser
-
-from SimpleWebSocketServer import SimpleWebSocketServer, SimpleSSLWebSocketServer
-
-from Models.Configuration import Configuration
-from Models.SimpleResponder import SimpleResponder
 from websocket_server import WebsocketServer
+from Models.Configuration import Configuration
 from Models import Command
 from Models.Packet import Enum, PacketType
 from Models.Packet import PacketId, PacketError
-import sys
-import queue
+
 
 PORT = 8000
 CONFIGURATION = "configuration"
@@ -41,7 +35,6 @@ WARECLOUD = "///////////////////////////\n" \
             "///////////AGENT///////////\n" \
             "///////////////////////////\n"
 
-debug = 0
 m_Command = Command.Command()
 
 # Called for every client connecting (after handshake)
@@ -50,7 +43,6 @@ def new_client(client, server):
     time.sleep(1)
     print("New client connected and was given id %d" % client['id'])
     packet = PacketId()
-    #print(">> Server MSG: " + packet.toJSON())
     server.send_message(client, packet.toJSON())
 
 
@@ -66,8 +58,9 @@ def message_received(client, server, message):
     print("<< Client MSG: " + message)
     if m_Command.is_valid_command() is True:
         packet = m_Command.run()
-        #print(">> Server MSG:", packet.type, packet.command)
-        #server.send_message(client, packet.toJSON())
+        if packet != None:
+            print(">> Server MSG:", packet.type, packet.command)
+            server.send_message(client, packet.toJSON())
     else:
         packet = PacketError(m_Command.parsed_command[0], Enum.PACKET_ERROR, PacketType.UNKN_CMD)
         print(">> Server MSG: " + PacketType.UNKN_CMD, Enum.PACKET_ERROR)
@@ -101,22 +94,13 @@ if __name__ == "__main__":
 
     l_configuration.get_all_software()
 
-    server = WebsocketServer(PORT)
+    server = WebsocketServer(8000, '0.0.0.0')
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received)
     print(">> Running on port :[", PORT, "] ...")
     server.run_forever()
 
-    # cls = SimpleResponder
-    # if options.ssl == 1:
-    #     server = SimpleSSLWebSocketServer(options.host, options.port, cls, options.cert, options.key, version=options.ver)
-    # else:
-    #     server = SimpleWebSocketServer('0.0.0.0', 8001, cls)
-    #
-    # signal.signal(signal.SIGINT, close_sig_handler)
-
-    # server.serveforever()
 
 
 

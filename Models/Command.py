@@ -14,6 +14,7 @@
 # //  WARECLOUD
 # //
 # ////////////////////////////////////////////////////////////////////////////////
+from Models.copytree import copytree
 from installer import *
 from Models.Packet import *
 from Models.eprint import eprint
@@ -28,10 +29,19 @@ m_bool = False
 
 ConfigurationPath = "%AppData%/"
 
-Firefox = "Mozilla"
+
 TeamViewer = "TeamViewer"
 Slack = "Slack"
-Chrome = "C:\\Users\\Cloquet Alban\\AppData\\Local\\Google\\Chrome\\User Data"
+
+Chrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\Google\\Chrome\\User Data"
+ChromeGoogle = "GoogleChrome"
+
+Firefox = "Mozilla"
+NotePad = "Notepad++"
+ConfigurationFolder = "C:\\Users\\%s\\AppData\\Roaming\\" % (getpass.getuser())
+
+
+GoogleChrome = "chrome.exe"
 
 
 class Command:
@@ -80,33 +90,36 @@ class Command:
 
     """  Follow Process """
     def follow(self, name):
-        packet = ""
         status = self.l_installer.follower(name)
         if status == "running":
             packet = PacketError(self.parsed_command[0], PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
         else:
             packet = PacketError(self.parsed_command[0], PacketType.F_FINISH, Enum.PACKET_FOLLOW)
-        packet.id = Enum.PACKET_FOLLOW
+
         return packet
 
     """  Configuration Software """
     def configure(self, name, path):
-        return True
+        if name == NotePad:
+            copytree('..\\configuration\\' + NotePad, ConfigurationFolder + NotePad)
+        if name == Firefox:
+            copytree('..\\configuration\\' + Firefox, ConfigurationFolder + Firefox)
+        if name == Chrome:
+            copytree('..\\configuration\\' + ChromeGoogle, ConfigurationFolder + ChromeGoogle)
+
+        return PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
 
     """  Installation Software """
     def install(self, name, path):
         self.l_installer.init(name)
-        t = threading.Thread(target=self.l_installer.install)
+        t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
-        return PacketError(self.parsed_command[0], PacketType.OK_INSTALL, Enum.PACKET_INSTALL)
+        return
 
     """  Download Software """
     def download(self, url, file_name):
-        # Download the file from `url` and save it locally under `file_name`:
-        # https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe
-        # urlretrieve(url, 'downloaded_file.py', self.reporthook)
-        threading.Thread(target=urlretrieve, args=(url, 'downloaded_file.py', self.reporthook)).start()
+        threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
 
     @staticmethod

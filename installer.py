@@ -9,6 +9,7 @@ import time
 import psutil
 import threading
 import subprocess
+from Models.Packet import *
 from Models.eprint import eprint
 
 threads = []
@@ -24,10 +25,21 @@ class Installer:
         print("//////////////////\nInstaller: INITIALISATION\n//////////////////")
         self.name = p_name
 
-    def install(self):
+    def install(self, server, client):
         installer = os.path.dirname(os.path.abspath(__file__)) + "\install\\" + self.name
+        print(installer)
+        try:
+            subprocess.check_call([installer])
+        except subprocess.CalledProcessError:
+            server.send_message(client, PacketError(self.name, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL).toJSON())
+            return  # handle errors in the called executable
+        except OSError:
+            server.send_message(client, PacketError(self.name, PacketType.FAILED_FIND_INSTALLER, Enum.PACKET_INSTALL).toJSON())
+            return # executable not found
+
         subprocess.call([installer])
-        return
+        server.send_message(client, PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
+        return True
 
     def follower(self, name):
         statut = ""

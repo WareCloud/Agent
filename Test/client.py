@@ -45,13 +45,17 @@ def on_open(ws):
 if __name__ == "__main__":
     websocket.enableTrace(True)
     # lol.append("error URL NAME")
-    lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe FirefoxInstaller")
-    lol.append("error URL NAME")
-    lol.append("error URL NAME")
-    lol.append("error URL NAME")
-    lol.append("error URL NAME")
+    # lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe FirefoxInstaller")
+    # lol.append("error URL NAME")
+    # lol.append("error URL NAME")
+    # lol.append("error URL NAME")
+    # lol.append("error URL NAME")
+    lol.append("install tamere")
+    # lol.append("install NppInstaller.exe")
+    # lol.append("follow NppInstaller.exe")
+    # lol.append("configure Notepad++ tamere")
+
     # lol.append("install FirefoxInstaller.exe")
-    # lol.append("follow FirefoxInstaller.exe")
     # lol.append("follow FirefoxInstaller.exe")
     # lol.append("follow FirefoxInstaller.exe")
     ws = websocket.WebSocketApp("ws://127.0.0.1:8000",

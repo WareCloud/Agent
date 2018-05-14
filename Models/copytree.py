@@ -30,5 +30,3 @@ def copytree(src, dst, symlinks = False, ignore = None):
           copytree(s, d, symlinks, ignore)
         else:
           shutil.copy2(s, d)
-
-#copytree('C:\\Users\\Cloquet Alban\\Documents\\WareCloud\\Git\\Agent\\configuration\\Config_Chrome','C:\\Users\\Cloquet Alban\\Documents\\WareCloud\\Git\\Agent\\configuration\\copyehre')
