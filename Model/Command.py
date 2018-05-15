@@ -88,7 +88,7 @@ class Command:
         if self.parsed_command[0] == "download":
             return self.download(self.parsed_command[1], self.parsed_command[2])
         if self.parsed_command[0] == "configure":
-            return self.configure(self.parsed_command[1], self.parsed_command[2])
+            return self.configure(self.parsed_command[1])
 
     """  Follow Process """
     def follow(self, name):
