@@ -104,13 +104,13 @@ class Command:
         return packet
 
     """  Configuration Software """
-    def configure(self, name, path):
+    def configure(self, name):
         if name == NotePad:
-            copytree('..\\configuration\\' + NotePad, ConfigurationFolder + NotePad)
+            copytree('configuration\\' + NotePad, ConfigurationFolder + NotePad)
         if name == Firefox:
-            copytree('..\\configuration\\' + Firefox, ConfigurationFolder + Firefox)
+            copytree('configuration\\' + Firefox, ConfigurationFolder + Firefox)
         if name == Chrome:
-            copytree('..\\configuration\\' + ChromeGoogle, ConfigurationFolder + ChromeGoogle)
+            copytree('configuration\\' + ChromeGoogle, ConfigurationFolder + ChromeGoogle)
 
         return PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
 
