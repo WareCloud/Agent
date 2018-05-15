@@ -100,6 +100,7 @@ class Command:
         else:
             packet = PacketError(self.parsed_command[0], PacketType.F_FINISH, Enum.PACKET_FOLLOW)
 
+        packet.path = name
         return packet
 
     """  Configuration Software """
