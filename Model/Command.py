@@ -35,8 +35,8 @@ ConfigurationPath = "%AppData%/"
 TeamViewer = "TeamViewer"
 Slack = "Slack"
 
-Chrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\Google\\Chrome\\User Data"
-ChromeGoogle = "GoogleChrome"
+Chrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\Google\\"
+ChromeGoogle = "Chrome"
 
 Firefox = "Mozilla"
 NotePad = "Notepad++"
