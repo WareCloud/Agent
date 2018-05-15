@@ -17,8 +17,15 @@ pip install -r requirements.txt
 
 python server.py --ssl 0 --cert ./cert.pem
 
-## Install
+or
 
+python server.py
 
-## Scripts naming convention
+## Create .exe
+
+python setup.py build
+
+## Run .exe
+
+server.exe
 
