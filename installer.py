@@ -26,7 +26,7 @@ class Installer:
         self.name = p_name
 
     def install(self, server, client):
-        installer = os.path.dirname(os.path.abspath(__file__)) + "\install\\" + self.name
+        installer = "install\\" + self.name
         print(installer)
         try:
             subprocess.check_call([installer])
