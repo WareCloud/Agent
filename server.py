@@ -26,6 +26,7 @@ from Model.Packet import PacketId, PacketError
 from websocket_server import WebsocketServer
 
 from Model import Command
+from Model.eprint import eprintlog
 
 PORT = 8000
 CONFIGURATION = "configuration"
@@ -48,22 +49,22 @@ def new_client(client, server):
 
 # Called for every client disconnecting
 def client_left(client, server):
-    print("Client(%d) disconnected" % client['id'])
+    eprintlog("Client(%d) disconnected" % client['id'])
 
 
 # Called when a client sends a message
 def message_received(client, server, message):
     m_Command.set_websocket(server, client)
     m_Command.new_command(message)
-    print("<< Client MSG: " + message)
+    eprintlog("<< Client MSG: " + message)
     if m_Command.is_valid_command() is True:
         packet = m_Command.run()
         if packet != None:
-            print(">> Server MSG:", packet.type, packet.command)
+            eprintlog(">> Server MSG:", packet.type, packet.command)
             server.send_message(client, packet.toJSON())
     else:
         packet = PacketError(m_Command.parsed_command[0], Enum.PACKET_ERROR, PacketType.UNKN_CMD)
-        print(">> Server MSG: " + PacketType.UNKN_CMD, Enum.PACKET_ERROR)
+        eprintlog(">> Server MSG: " + PacketType.UNKN_CMD, Enum.PACKET_ERROR)
         server.send_message(client, packet.toJSON())
 
 if __name__ == "__main__":
@@ -75,11 +76,16 @@ if __name__ == "__main__":
     parser.add_option("--key", default='./key.pem', type='string', action="store", dest="key", help="key (./key.pem)")
     parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
     parser.add_option("--debug", default=0, type='int', action="store", dest="debug", help="debug option")
-
     (options, args) = parser.parse_args()
-    print(WARECLOUD)
+
+    file = open("AgentWareCloud.log", "w")
+    file.write("")
+    file.close()
+
+    eprintlog(WARECLOUD)
+
     if options.debug == 0:
-        print(">> Configuration de l'agent ...")
+        eprintlog(">> Configuration de l'agent ...")
 
     l_configuration = Configuration()
     if l_configuration.has_directory(CONFIGURATION) is False:
@@ -89,7 +95,7 @@ if __name__ == "__main__":
 
     """ Lancement du serveur """
     if options.debug == 0:
-        print(">> Lancement du serveur ...")
+        eprintlog(">> Lancement du serveur ...")
 
     l_configuration.get_all_software()
 
@@ -97,7 +103,7 @@ if __name__ == "__main__":
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received)
-    print(">> Running on port :[", PORT, "] ...")
+    eprintlog(">> Running on port :[", PORT, "] ...")
     server.run_forever()
 
 

@@ -9,6 +9,7 @@
 # python_version	: 3.6
 # ==============================================================================
 
+from Model.eprint import eprintlog
 import errno
 import logging
 # Import the modules needed to run the script.
@@ -59,7 +60,7 @@ class Configuration:
     def create_directory(self, name):
         try:
             os.makedirs(name)
-            print("Sucessfully created directory: ", name)
+            eprintlog("Sucessfully created directory: ", name)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -67,7 +68,7 @@ class Configuration:
     def create_files(self, name):
         try:
             open(name, 'a').close()
-            print("Sucessfully created files: ", name)
+            eprintlog("Sucessfully created files: ", name)
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
@@ -76,7 +77,7 @@ class Configuration:
 
     def get_all_software(self):
         return ""
-        print(platform.system())
+        eprintlog(platform.system())
         if platform.system() != self.WINDOWS:
             self.logger.info(platform.system() + ' is not supported')
             return None
@@ -87,7 +88,7 @@ class Configuration:
       #      return None
 
         import wmi
-        print("Software Initialisation")
+        eprintlog("Software Initialisation")
         c = wmi.WMI()
         items = []
         for p in c.Win32_Product():

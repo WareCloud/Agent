@@ -1,6 +1,6 @@
 ## Overview
 
-WareCloud: Agent (0.X)
+WareCloud: Agent (0.1) Beta
 
 ## Requirements
 
