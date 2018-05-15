@@ -50,10 +50,12 @@ class Command:
     """  Handles for received messages """
     server = None
     client = None
+    file_name = ""
 
     def __init__(self):
         self.name = ""
         self.version = ""
+        self.file_name = ""
         self.l_installer = Installer()
         self.parsed_command = ""
         self.m_Commands = dict()
@@ -121,6 +123,7 @@ class Command:
 
     """  Download Software """
     def download(self, url, file_name):
+        Command.file_name = file_name
         threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
 
