@@ -18,14 +18,14 @@
 # Import the modules needed to run the script.
 
 import ssl
-
 from optparse import OptionParser
-from websocket_server import WebsocketServer
-from Models.Configuration import Configuration
-from Models import Command
-from Models.Packet import Enum, PacketType
-from Models.Packet import PacketId, PacketError
 
+from Model.Configuration import Configuration
+from Model.Packet import Enum, PacketType
+from Model.Packet import PacketId, PacketError
+from websocket_server import WebsocketServer
+
+from Model import Command
 
 PORT = 8000
 CONFIGURATION = "configuration"
@@ -77,7 +77,6 @@ if __name__ == "__main__":
     parser.add_option("--debug", default=0, type='int', action="store", dest="debug", help="debug option")
 
     (options, args) = parser.parse_args()
-
     print(WARECLOUD)
     if options.debug == 0:
         print(">> Configuration de l'agent ...")

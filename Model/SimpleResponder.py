@@ -17,14 +17,11 @@
 
 # Import the modules needed to run the script.
 
+from Model.Packet import Enum
+from Model.Packet import PacketId, PacketError
 from SimpleWebSocketServer import WebSocket
 
-from Models import Command
-from Models.Packet import Enum
-from Models.Packet import PacketId, PacketError
-import sys
-import queue
-
+from Model import Command
 
 clients = []
 m_Command = Command.Command()

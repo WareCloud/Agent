@@ -9,14 +9,15 @@
 # python_version	: 3.6
 # ==============================================================================
 
+import errno
+import logging
 # Import the modules needed to run the script.
 import os
-import errno
-from Models import Software
 import platform
-import logging
 from logging.handlers import RotatingFileHandler
-from Models.eprint import eprint
+
+from Model import Software
+
 
 class Configuration:
 

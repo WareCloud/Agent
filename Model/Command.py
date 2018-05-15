@@ -9,17 +9,18 @@
 # python_version	: 3.6
 # ==============================================================================
 
+import sys
+from urllib.request import urlretrieve
+
+from Model.Packet import *
 # ////////////////////////////////////////////////////////////////////////////////
 # //
 # //  WARECLOUD
 # //
 # ////////////////////////////////////////////////////////////////////////////////
-from Models.copytree import copytree
+from Model.copytree import copytree
+
 from installer import *
-from Models.Packet import *
-from Models.eprint import eprint
-from urllib.request import urlretrieve
-import sys
 
 LINUX = "Linux"
 WINDOWS = "Windows"

@@ -36,7 +36,7 @@ def on_open(ws):
             time.sleep(p)
             ws.send(i)
             p += 3
-        time.sleep(1)
+        time.sleep(3)
         ws.close()
         print("thread terminating...")
     _thread.start_new_thread(run, ())

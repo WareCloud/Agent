@@ -5,12 +5,12 @@
 # ////////////////////////////////////////////////////////////////////////////////
 
 import os
-import time
-import psutil
-import threading
 import subprocess
-from Models.Packet import *
-from Models.eprint import eprint
+
+import psutil
+from Model.Packet import *
+
+from Model.eprint import eprint
 
 threads = []
 
