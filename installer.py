@@ -29,7 +29,7 @@ class Installer:
         installer = "install\\" + self.name
         print(installer)
         try:
-            subprocess.check_call([installer])
+            subprocess.check_call(installer + " /S", shell=True)
         except subprocess.CalledProcessError:
             server.send_message(client, PacketError(self.name, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL).toJSON())
             return  # handle errors in the called executable
