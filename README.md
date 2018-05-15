@@ -23,9 +23,10 @@ python server.py
 
 ## Create .exe
 
+rm -rf build
 python setup.py build
 
 ## Run .exe
 
-server.exe
+Agent/build/exe.win32-3.6/server.exe
 
