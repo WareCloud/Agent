@@ -133,12 +133,13 @@ class Command:
         readsofar = blocknum * blocksize
         if totalsize > 0:
             percent = readsofar * 1e2 / totalsize
-            s = "\r%5.1f%% %*d / %d" % (
-                percent, len(str(totalsize)), readsofar, totalsize)
-            sys.stderr.write(s)
-            Command.server.send_message(Command.client, PacketError(s, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE).toJSON())
+            packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
+            packet.path = Command.file_name
+            Command.server.send_message(Command.client, packet.toJSON())
             if readsofar >= totalsize:  # near the end
                 sys.stderr.write("\n")
-                Command.server.send_message(Command.client, PacketError(s, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE).toJSON())
+                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = Command.file_name
+                Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
