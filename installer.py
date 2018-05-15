@@ -37,7 +37,7 @@ class Installer:
             server.send_message(client, PacketError(self.name, PacketType.FAILED_FIND_INSTALLER, Enum.PACKET_INSTALL).toJSON())
             return # executable not found
 
-        subprocess.call([installer])
+        print(PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
         server.send_message(client, PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
         return True
 
