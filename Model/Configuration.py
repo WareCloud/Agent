@@ -5,17 +5,15 @@
 # date				: 2017/08/20
 # version			: Python 3.6
 # usage				: python Configuration.py
-# notes				: 
+# notes				:
 # python_version	: 3.6
 # ==============================================================================
 
-from Model.eprint import eprintlog
+from Model.Logger import *
 import errno
-import logging
-# Import the modules needed to run the script.
 import os
 import platform
-from logging.handlers import RotatingFileHandler
+
 
 from Model import Software
 
@@ -28,18 +26,6 @@ class Configuration:
         self.current = os.getcwd()
         self.WINDOWS = 'Windows'
         self.LINUX = "Linux"
-
-        """logger init"""
-        self.logger = logging.getLogger()
-        self.logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
-        file_handler = RotatingFileHandler('activity.log', 'a', 1000000, 1)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
-        stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(logging.DEBUG)
-        self.logger.addHandler(stream_handler)
 
     def has_directory(self, name):
         for f in self.files:

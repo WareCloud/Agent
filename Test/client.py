@@ -51,9 +51,9 @@ if __name__ == "__main__":
     # lol.append("error URL NAME")
     # lol.append("error URL NAME")
     # lol.append("install tamere")
-    lol.append("install Notepad++.exe")
+    # lol.append("install Notepad+.exe")
     # lol.append("follow NppInstaller.exe")
-    lol.append("configure Notepad++")
+    # lol.append("configure Notepad++")
 
     # lol.append("install FirefoxInstaller.exe")
     # lol.append("follow FirefoxInstaller.exe")

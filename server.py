@@ -25,7 +25,7 @@ from Model.Packet import Enum, PacketType
 from Model.Packet import PacketId, PacketError
 from websocket_server import WebsocketServer
 from Model import Command
-from Model.eprint import eprintlog
+from Model.Logger import *
 
 PORT = 8000
 CONFIGURATION = "configuration"
@@ -85,10 +85,11 @@ if __name__ == "__main__":
         parser.add_option("--debug", default=0, type='int', action="store", dest="debug", help="debug option")
         (options, args) = parser.parse_args()
 
-        file = open("AgentWareCloud.log", "w")
-        file.write("")
-        file.close()
+        logger = Logger.__call__().get_logger()
 
+        f = open("AgentWareCloud.log", "w")
+        f.write("")
+        f.close()
         eprintlog(WARECLOUD)
 
         if options.debug == 0:

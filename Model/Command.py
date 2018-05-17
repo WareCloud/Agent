@@ -9,16 +9,18 @@
 # python_version	: 3.6
 # ==============================================================================
 
-import sys
-import threading
-from urllib.request import urlretrieve
-
-from Model.Packet import *
 # ////////////////////////////////////////////////////////////////////////////////
 # //
 # //  WARECLOUD
 # //
 # ////////////////////////////////////////////////////////////////////////////////
+
+import sys
+import threading
+from urllib.request import urlretrieve
+
+from Model.Packet import *
+
 from Model.copytree import copytree
 
 from installer import *

@@ -1,13 +1,28 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
+# title				: server.py
+# description		: Simple implementation of server
+# author			: Cloquet Alban
+# date				: 2017/06/19
+# version			: Python 3.6
+# usage				: python server.py
+# notes				:
+# python_version	: 3.6
+# ==============================================================================
 
+# ////////////////////////////////////////////////////////////////////////////////
+# //
+# //  WARECLOUD
+# //
+# ////////////////////////////////////////////////////////////////////////////////
+
+from Model.Logger import *
 import os
 import shutil
 import stat
-from Model.eprint import eprintlog
 
 def copytree(src, dst, symlinks = False, ignore = None):
-      eprintlog("SRC=" + src)
-      eprintlog("DST=" + dst)
+      Logger.__call__().get_logger().info("SRC=" + src)
+      Logger.__call__().get_logger().info("DST=" + dst)
       if not os.path.exists(dst):
         os.makedirs(dst)
         shutil.copystat(src, dst)
@@ -31,4 +46,10 @@ def copytree(src, dst, symlinks = False, ignore = None):
         elif os.path.isdir(s):
           copytree(s, d, symlinks, ignore)
         else:
-          shutil.copy2(s, d)
+            try:
+                shutil.copy2(s, d)
+            except IOError as e:
+                Logger.__call__().get_logger().info("Unable to copy file. " + e.filename)
+
+
+
