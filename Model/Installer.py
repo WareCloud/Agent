@@ -9,8 +9,6 @@ import psutil
 from Model.Packet import *
 from Model.Logger import *
 
-threads = []
-
 
 class Installer:
 
@@ -23,7 +21,7 @@ class Installer:
         self.name = p_name
 
     def install(self, server, client):
-        installer = "install\\" + self.name
+        installer = "\\install\\" + self.name
         print(installer)
         try:
             if self.name == "Chrome.exe":

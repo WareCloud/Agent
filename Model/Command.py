@@ -15,15 +15,11 @@
 # //
 # ////////////////////////////////////////////////////////////////////////////////
 
-import sys
 import threading
 from urllib.request import urlretrieve
 
-from Model.Packet import *
-
 from Model.copytree import copytree
-
-from installer import *
+from Model.Installer import *
 
 LINUX = "Linux"
 WINDOWS = "Windows"

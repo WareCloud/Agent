@@ -25,6 +25,7 @@ from Model.Packet import Enum, PacketType
 from Model.Packet import PacketId, PacketError
 from websocket_server import WebsocketServer
 from Model import Command
+from Model.SoftwareInfo import SoftwareInfo
 from Model.Logger import *
 
 PORT = 8000
@@ -39,16 +40,16 @@ m_Command = Command.Command()
 
 # Called for every client connecting (after handshake)
 def new_client(client, server):
-    import time
-    time.sleep(1)
-    print("New client connected and was given id %d" % client['id'])
+    softwareInfo = SoftwareInfo()
+    print(">>> New client [%d] connected" % client['id'])
     packet = PacketId()
+    packet.software = softwareInfo.get_all_software()
     server.send_message(client, packet.toJSON())
 
 
 # Called for every client disconnecting
 def client_left(client, server):
-    eprintlog("Client(%d) disconnected" % client['id'])
+    eprintlog("Client[%d] disconnected" % client['id'])
 
 
 # Called when a client sends a message
@@ -92,20 +93,13 @@ if __name__ == "__main__":
         f.close()
         eprintlog(WARECLOUD)
 
-        if options.debug == 0:
-            eprintlog(">> Configuration de l'agent ...")
-
+        eprintlog(">> Configuration de l'agent ...")
         l_configuration = Configuration()
-        if l_configuration.has_directory(CONFIGURATION) is False:
-            l_configuration.create_directory(CONFIGURATION)
-        if l_configuration.has_directory(INSTALL) is False:
-            l_configuration.create_directory(INSTALL)
-
+        l_configuration.create_directory(CONFIGURATION)
+        l_configuration.create_directory(INSTALL)
         """ Lancement du serveur """
         if options.debug == 0:
             eprintlog(">> Lancement du serveur ...")
-
-        l_configuration.get_all_software()
 
         server = WebsocketServer(8000, '0.0.0.0')
         server.set_fn_new_client(new_client)
