@@ -3,9 +3,11 @@
 import os
 import shutil
 import stat
-
+from Model.eprint import eprintlog
 
 def copytree(src, dst, symlinks = False, ignore = None):
+      eprintlog("SRC=" + src)
+      eprintlog("DST=" + dst)
       if not os.path.exists(dst):
         os.makedirs(dst)
         shutil.copystat(src, dst)

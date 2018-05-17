@@ -11,7 +11,8 @@ if sys.platform == "win32":
 setup(
     name='Agent',
     version='0.1',
-    options={'build.exe': {'include_files': include_files}},
+    options={'build.exe': {'include_files': include_files,
+                           "icon": "brand-small.ico"}},
     executables=[Executable("server.py", base=base)],
     url='https://github.com/WareCloud/Agent',
     license='Warecloud',

@@ -35,7 +35,6 @@ class ServerTest(unittest.TestCase):
     def test_follow(self):
         name = "follow System"
         command.new_command(name)
-
         packet = PacketError(name, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
         value = command.follow("System")
         self.assertEqual(packet.id, value.id)
@@ -44,7 +43,6 @@ class ServerTest(unittest.TestCase):
 
         name = "follow toto.exe"
         command.new_command(name)
-
         packet = PacketError(name, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
         value = command.follow("toto.exe")
         self.assertEqual(packet.id, value.id)

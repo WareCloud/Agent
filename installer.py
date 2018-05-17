@@ -14,7 +14,6 @@ from Model.eprint import eprint
 
 threads = []
 
-
 class Installer:
 
     def __init__(self):
@@ -29,7 +28,10 @@ class Installer:
         installer = "install\\" + self.name
         print(installer)
         try:
-            subprocess.check_call(installer + " /S", shell=True)
+            if self.name == "Chrome.exe":
+                subprocess.check_call(installer + " /silent /install", shell=True)
+            else:
+                subprocess.check_call(installer + " /S", shell=True)
         except subprocess.CalledProcessError:
             server.send_message(client, PacketError(self.name, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL).toJSON())
             return  # handle errors in the called executable

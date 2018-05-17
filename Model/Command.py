@@ -35,8 +35,8 @@ ConfigurationPath = "%AppData%/"
 TeamViewer = "TeamViewer"
 Slack = "Slack"
 
-Chrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\Google\\"
-ChromeGoogle = "Chrome"
+ConfigurationFolderChrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\"
+Chrome = "Chrome"
 
 Firefox = "Mozilla"
 NotePad = "Notepad++"
@@ -84,7 +84,7 @@ class Command:
     """  Execute Command """
     def run(self):
         if self.parsed_command[0] == "install":
-            return self.install(self.parsed_command[1], 0)
+            return self.install(self.parsed_command[1])
         if self.parsed_command[0] == "follow":
             return self.follow(self.parsed_command[1])
         if self.parsed_command[0] == "download":
@@ -107,15 +107,17 @@ class Command:
     def configure(self, name):
         if name == NotePad:
             copytree('configuration\\' + NotePad, ConfigurationFolder + NotePad)
-        if name == Firefox:
+        if name == "Firefox":
             copytree('configuration\\' + Firefox, ConfigurationFolder + Firefox)
         if name == Chrome:
-            copytree('configuration\\' + ChromeGoogle, ConfigurationFolder + ChromeGoogle)
+            copytree('configuration\\Google', ConfigurationFolderChrome)
 
-        return PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
+        packet = PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
+        packet.path = name + '.exe'
+        return packet
 
     """  Installation Software """
-    def install(self, name, path):
+    def install(self, name):
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
