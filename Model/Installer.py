@@ -8,6 +8,7 @@ import subprocess
 import psutil
 from Model.Packet import *
 from Model.Logger import *
+from Model.SoftwareInfo import *
 
 
 class Installer:
@@ -21,7 +22,7 @@ class Installer:
         self.name = p_name
 
     def install(self, server, client):
-        installer = "\\install\\" + self.name
+        installer = "install\\" + self.name
         print(installer)
         try:
             if self.name == "Chrome.exe":
@@ -39,6 +40,30 @@ class Installer:
 
         print(PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
         server.send_message(client, PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
+        return True
+
+    def uninstall(self, server, client):
+        softwareInfo = SoftwareInfo()
+        softwares = softwareInfo.get_all_software()
+        call = ''
+
+        for x in softwares.arraySoft:
+            if x.name.find(self.name) != -1:
+                call = x.uninstall
+        try:
+            subprocess.check_call(call, shell=True)
+        except subprocess.CalledProcessError as e:
+            Logger.__call__().get_logger().debug(e)
+            server.send_message(client, PacketError(self.name, PacketType.FAILED_UNINSTALL, Enum.PACKET_UNINSTALL).toJSON())
+            return  # handle errors in the called executable
+        except OSError as e:
+            Logger.__call__().get_logger().debug(e.filename + " " + e.errno + " " + e.strerror)
+            server.send_message(client,
+            PacketError(self.name, PacketType.FAILED_FIND_UNINSTALLER, Enum.PACKET_UNINSTALL).toJSON())
+            return  # executable not found
+
+        print(PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_UNINSTALL).toJSON())
+        server.send_message(client, PacketError(self.name, PacketType.OK_UNINSTALL, Enum.PACKET_UNINSTALL).toJSON())
         return True
 
     def follower(self, name):

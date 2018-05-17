@@ -83,6 +83,8 @@ class Command:
     def run(self):
         if self.parsed_command[0] == "install":
             return self.install(self.parsed_command[1])
+        if self.parsed_command[0] == "uninstall":
+            return self.uninstall(self.parsed_command[1])
         if self.parsed_command[0] == "follow":
             return self.follow(self.parsed_command[1])
         if self.parsed_command[0] == "download":
@@ -118,6 +120,14 @@ class Command:
     def install(self, name):
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
+        threads.append(t)
+        t.start()
+        return
+
+    """  Installation Software """
+    def uninstall(self, name):
+        self.l_installer.init(name)
+        t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
         return
