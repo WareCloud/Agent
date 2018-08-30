@@ -173,7 +173,7 @@ class Command:
 
             currenttimer = int(round(time.time() * 1000))
             if currenttimer > self.timer + 500:
-                Command.timer = currenttimer
+                self.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = self.fileName
                 self.server.send_message(self.client, packet.toJSON())
