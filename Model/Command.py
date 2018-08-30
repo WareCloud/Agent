@@ -17,6 +17,8 @@
 
 import threading
 from urllib.request import urlretrieve
+from urllib.error import URLError
+import urllib
 
 from Model.copytree import copytree
 from Model.Installer import *
@@ -137,7 +139,29 @@ class Command:
     """  Download Software """
     def download(self, url, file_name):
         Command.fileName = file_name
-        threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
+        try:
+            urllib.request.urlopen(url)
+        except urllib.error.HTTPError as e:
+            eprintlog(e.code)
+            eprintlog(e.read())
+            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+            packet.path = Command.fileName
+            Command.server.send_message(Command.client, packet.toJSON())
+        except URLError as urlerror:
+            if hasattr(urlerror, 'reason'):
+                eprintlog('We failed to reach a server.')
+                eprintlog('Reason: ', urlerror.reason)
+                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = url
+                Command.server.send_message(Command.client, packet.toJSON())
+            elif hasattr(urlerror, 'code'):
+                eprintlog('The server couldn\'t fulfill the request.')
+                eprintlog('Error code: ', urlerror.code)
+                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = url
+                Command.server.send_message(Command.client, packet.toJSON())
+        else:
+            threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
 
     @staticmethod
@@ -154,7 +178,6 @@ class Command:
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
-                sys.stderr.write("\n")
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = Command.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
