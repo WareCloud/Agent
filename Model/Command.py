@@ -170,8 +170,8 @@ class Command:
             percent = readsofar * 1e2 / totalsize
 
             currenttimer = int(round(time.time() * 1000))
-            if currenttimer > Command.timer + 500:
-                Command.timer = currenttimer
+            if currenttimer > self.timer + 500:
+                self.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = self.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
