@@ -17,7 +17,7 @@
 
 import threading
 from urllib.request import urlretrieve
-
+import urllib
 from Model.copytree import copytree
 from Model.Installer import *
 import time
@@ -137,7 +137,16 @@ class Command:
     """  Download Software """
     def download(self, url, file_name):
         Command.fileName = file_name
-        threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
+        try:
+            urllib.request.urlopen(url)
+        except urllib.error.HTTPError as e:
+            print(e.code)
+            print(e.read())
+            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+            packet.path = Command.fileName
+            Command.server.send_message(Command.client, packet.toJSON())
+        else:
+            threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
 
     @staticmethod
@@ -154,7 +163,6 @@ class Command:
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
-                sys.stderr.write("\n")
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = Command.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
