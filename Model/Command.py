@@ -66,6 +66,7 @@ class Command:
         self.m_Commands["uninstall"] = self.download
         self.m_Commands["update"] = self.download
         self.m_Commands["download"] = self.download
+        self.m_Commands["download_cfg"] = self.download_cfg
 
     def set_websocket(self, server, clients):
         Command.server = server
@@ -94,6 +95,9 @@ class Command:
             return self.download(self.parsed_command[1], self.parsed_command[2])
         if self.parsed_command[0] == "configure":
             return self.configure(self.parsed_command[1])
+        if self.parsed_command[0] == "download_cfg":
+            return self.download_cfg(self.parsed_command[1], self.parsed_command[2])
+
 
     """  Follow Process """
     def follow(self, name):
@@ -161,6 +165,34 @@ class Command:
                 Command.server.send_message(Command.client, packet.toJSON())
         else:
             threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
+        return
+
+    """  Download Configure """
+    def download_cfg(self, url, file_name):
+        self.fileName = file_name
+        try:
+            urllib.request.urlopen(url)
+        except urllib.error.HTTPError as e:
+            eprintlog(e.code)
+            eprintlog(e.read())
+            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+            packet.path = self.fileName
+            Command.server.send_message(Command.client, packet.toJSON())
+        except URLError as urlerror:
+            if hasattr(urlerror, 'reason'):
+                eprintlog('We failed to reach a server.')
+                eprintlog('Reason: ', urlerror.reason)
+                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = url
+                Command.server.send_message(Command.client, packet.toJSON())
+            elif hasattr(urlerror, 'code'):
+                eprintlog('The server couldn\'t fulfill the request.')
+                eprintlog('Error code: ', urlerror.code)
+                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = url
+                Command.server.send_message(Command.client, packet.toJSON())
+        else:
+            threading.Thread(target=urlretrieve, args=(url, 'configure/' + file_name, self.reporthook)).start()
         return
 
     #@staticmethod
