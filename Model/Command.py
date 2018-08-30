@@ -137,14 +137,14 @@ class Command:
 
     """  Download Software """
     def download(self, url, file_name):
-        Command.fileName = file_name
+        self.fileName = file_name
         try:
             urllib.request.urlopen(url)
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
             packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-            packet.path = Command.fileName
+            packet.path = self.fileName
             Command.server.send_message(Command.client, packet.toJSON())
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
@@ -163,8 +163,8 @@ class Command:
             threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
 
-    @staticmethod
-    def reporthook(blocknum, blocksize, totalsize):
+    #@staticmethod
+    def reporthook(self, blocknum, blocksize, totalsize):
         readsofar = blocknum * blocksize
         if totalsize > 0:
             percent = readsofar * 1e2 / totalsize
@@ -173,12 +173,12 @@ class Command:
             if currenttimer > Command.timer + 500:
                 Command.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = Command.fileName
+                packet.path = self.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = Command.fileName
+                packet.path = self.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
