@@ -14,7 +14,7 @@
 # //  WARECLOUD
 # //
 # ////////////////////////////////////////////////////////////////////////////////
-
+import tarfile
 import threading
 from urllib.request import urlretrieve
 from urllib.error import URLError
@@ -28,23 +28,17 @@ WINDOWS = "Windows"
 
 threads = []
 m_bool = False
-
 ConfigurationPath = "%AppData%/"
-
 
 TeamViewer = "TeamViewer"
 Slack = "Slack"
-
-ConfigurationFolderChrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\"
-Chrome = "Chrome"
-
 Firefox = "Mozilla"
 NotePad = "Notepad++"
 ConfigurationFolder = "C:\\Users\\%s\\AppData\\Roaming\\" % (getpass.getuser())
 
-
-GoogleChrome = "chrome.exe"
-
+#Chrome = "Chrome"
+#ConfigurationFolderChrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\"
+#GoogleChrome = "chrome.exe"
 
 class Command:
     """  Handles for received messages """
@@ -68,10 +62,12 @@ class Command:
         self.m_Commands["download"] = self.download
         self.m_Commands["download_cfg"] = self.download_cfg
 
+    """ Init Websocket in the classe"""
     def set_websocket(self, server, clients):
         Command.server = server
         Command.client = clients
 
+    """ Parsing Commands """
     def new_command(self, command):
         self.parsed_command = str(command).split()
 
@@ -112,12 +108,17 @@ class Command:
 
     """  Configuration Software """
     def configure(self, name):
-        if name == NotePad:
-            copytree('configuration\\' + NotePad, ConfigurationFolder + NotePad)
-        if name == "Firefox":
-            copytree('configuration\\' + Firefox, ConfigurationFolder + Firefox)
-        if name == Chrome:
-            copytree('configuration\\Google', ConfigurationFolderChrome)
+
+        import tarfile
+        if name.endswith("tar.gz"):
+            tar = tarfile.open(name, "r:gz")
+            tar.extractall()
+            tar.close()
+            copytree('configuration\\' + name, ConfigurationFolder + name)
+
+        #Chrome is now removed
+        #if name == Chrome:
+        #    copytree('configuration\\Google', ConfigurationFolderChrome)
 
         packet = PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
         packet.path = name + '.exe'
@@ -182,20 +183,19 @@ class Command:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
-                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
                 packet.path = url
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
-                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
+                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
                 packet.path = url
                 Command.server.send_message(Command.client, packet.toJSON())
         else:
-            threading.Thread(target=urlretrieve, args=(url, 'configure/' + file_name, self.reporthook)).start()
+            threading.Thread(target=urlretrieve, args=(url, 'configure/' + file_name, self.reporthook_cfg)).start()
         return
 
-    #@staticmethod
     def reporthook(self, blocknum, blocksize, totalsize):
         readsofar = blocknum * blocksize
         if totalsize > 0:
@@ -209,6 +209,24 @@ class Command:
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
+                packet.path = self.fileName
+                Command.server.send_message(Command.client, packet.toJSON())
+        else:  # total size is unknown
+            sys.stderr.write("read %d\n" % (readsofar,))
+
+    def reporthook_cfg(self, blocknum, blocksize, totalsize):
+        readsofar = blocknum * blocksize
+        if totalsize > 0:
+            percent = readsofar * 1e2 / totalsize
+            currenttimer = int(round(time.time() * 1000))
+            if currenttimer > self.timer + 500:
+                self.timer = currenttimer
+                packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE_CFG)
+                packet.path = self.fileName
+                Command.server.send_message(Command.client, packet.toJSON())
+
+            if readsofar >= totalsize:  # near the end
+                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE_CFG)
                 packet.path = self.fileName
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
