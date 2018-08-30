@@ -45,7 +45,9 @@ def on_open(ws):
 if __name__ == "__main__":
     websocket.enableTrace(True)
     # lol.append("error URL NAME")
-    # lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/fr/win/9705c66ad49acf77f0e875327f07d4ab65a4d7921dce9d41d6f421665a2b467b/Firefox%20Installer.exe lol")
+    lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/en-US/win/a24e79e56c8dd45f6e865616580597def425efb223c7444ca6534bec5b8f4054/Firefox%20Installer.exe TTTT")
+    lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/en-US/win/a24e79e56c8dd45f6e865616580597def425efb223c7444ca6534bec5b8f4054/Firefox%20Installer.exe PPP")
+    lol.append("download https://stubdownloader.cdn.mozilla.net/builds/firefox-stub/en-US/win/a24e79e56c8dd45f6e865616580597def425efb223c7444ca6534bec5b8f4054/Firefox%20Installer.exe OOOOO")
     # lol.append("error URL NAME")
     # lol.append("error URL NAME")
     # lol.append("error URL NAME")
