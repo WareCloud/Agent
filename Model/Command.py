@@ -19,7 +19,6 @@ import threading
 from urllib.request import urlretrieve
 from urllib.error import URLError
 import urllib
-
 from Model.copytree import copytree
 from Model.Installer import *
 import time
