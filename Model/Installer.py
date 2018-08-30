@@ -73,12 +73,18 @@ class Installer:
         for x in list_pid:
             if psutil.pid_exists(x) is True:
                 p = psutil.Process(x)
+                if p.name():
+                    eprint(p.name())
+
+                eprint("statut follow : " + statut)
                 if p.name() == name:
                     eprint("Found!")
                     process = p
                     statut = process.status()
                     if str(statut) == "running":
                         return str(statut)
+
+        eprint("statut follow : " + statut)
         return statut
 
 
