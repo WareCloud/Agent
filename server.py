@@ -52,7 +52,6 @@ def new_client(client, server):
 def client_left(client, server):
     eprintlog("Client[%d] disconnected" % client['id'])
 
-
 # Called when a client sends a message
 def message_received(client, server, message):
     m_Command = Command.Command()
