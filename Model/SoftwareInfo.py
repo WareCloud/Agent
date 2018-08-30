@@ -12,11 +12,14 @@ class SoftwareInfo:
         self.LINUX = "Linux"
 
     def get_all_software(self):
+
+        #get the platform operating system.
         if platform.system() != self.WINDOWS:
             eprintlog(platform.system() + ' is not supported')
             return None
 
         item = []
+        # proc_arch checked.
         if self.proc_arch == 'x86' and not self.proc_arch64:
             arch_keys = {0}
         elif self.proc_arch == 'x86' or self.proc_arch == 'amd64':
@@ -41,3 +44,23 @@ class SoftwareInfo:
 
         var = ContainerSoft(item)
         return var
+
+if __name__ == "__main__":
+    lol = SoftwareInfo()
+    print(lol.get_all_software().toJSON())
+
+
+    import wmi
+
+
+    c = wmi.WMI()
+    items = []
+    for p in c.Win32_Product():
+        soft = Software()
+        soft.name = format(p.PackageName)
+        soft.uninstall = format(p.Vendor)
+        soft.version = format(p.Version)
+        soft.install = format(p.InstallLocation)
+        items.append(soft)
+        var = ContainerSoft(items)
+    print(var.toJSON())

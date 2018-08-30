@@ -61,6 +61,7 @@ class Enum:
     PACKET_ERROR = 20
 
 
+#Packet type between the Agent and the Client
 class PacketId:
 
     def __init__(self):

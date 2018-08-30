@@ -124,7 +124,7 @@ class Command:
         t.start()
         return
 
-    """  Installation Software """
+    """  Uninstallation Software """
     def uninstall(self, name):
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))

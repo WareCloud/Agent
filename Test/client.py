@@ -51,13 +51,14 @@ if __name__ == "__main__":
     # lol.append("error URL NAME")
     # lol.append("error URL NAME")
     # lol.append("install tamere")
-    # lol.append("install Notepad+.exe")
+    # lol.append("install Notepad++.exe")
     # lol.append("follow NppInstaller.exe")
     # lol.append("configure Notepad++")
 
-    # lol.append("install FirefoxInstaller.exe")
-    # lol.append("follow FirefoxInstaller.exe")
-    # lol.append("follow FirefoxInstaller.exe")
+    #lol.append("install Firefox.exe")
+    lol.append("uninstall Firefox")
+    # lol.append("follow Firefox.exe")
+    # lol.append("follow Firefox.exe")
     ws = websocket.WebSocketApp("ws://127.0.0.1:8000",
                                 on_message=on_message,
                                 on_error=on_error,

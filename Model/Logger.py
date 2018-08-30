@@ -30,6 +30,7 @@ class Singleton(type):
         return cls._instances[cls]
 
 
+#Logger for debugging in case of troubles
 class Logger(metaclass=Singleton):
     _logger = None
 

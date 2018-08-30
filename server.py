@@ -36,7 +36,7 @@ WARECLOUD = "///////////////////////////\n" \
             "///////////AGENT///////////\n" \
             "///////////////////////////\n"
 
-m_Command = Command.Command()
+
 
 # Called for every client connecting (after handshake)
 def new_client(client, server):
@@ -54,6 +54,7 @@ def client_left(client, server):
 
 # Called when a client sends a message
 def message_received(client, server, message):
+    m_Command = Command.Command()
     m_Command.set_websocket(server, client)
     m_Command.new_command(message)
     eprintlog("<< Client MSG: " + message)
@@ -84,10 +85,10 @@ if __name__ == "__main__":
         parser.add_option("--key", default='./key.pem', type='string', action="store", dest="key", help="key (./key.pem)")
         parser.add_option("--ver", default=ssl.PROTOCOL_TLSv1, type=int, action="store", dest="ver", help="ssl version")
         parser.add_option("--debug", default=0, type='int', action="store", dest="debug", help="debug option")
+        parser.add_option("--gui", default=0, type='int', action="store", dest="gui", help="GUI ?")
         (options, args) = parser.parse_args()
 
         logger = Logger.__call__().get_logger()
-
         f = open("AgentWareCloud.log", "w")
         f.write("")
         f.close()
@@ -101,12 +102,12 @@ if __name__ == "__main__":
         if options.debug == 0:
             eprintlog(">> Lancement du serveur ...")
 
+        eprintlog(">> Running on port :[", PORT, "] ...")
         server = WebsocketServer(8000, '0.0.0.0')
         server.set_fn_new_client(new_client)
         server.set_fn_client_left(client_left)
         server.set_fn_message_received(message_received)
-        eprintlog(">> Running on port :[", PORT, "] ...")
-        server.run_forever()
+        server.run_forever().start()
     else:
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
 
