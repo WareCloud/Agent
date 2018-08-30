@@ -48,8 +48,10 @@ GoogleChrome = "chrome.exe"
 
 class Command:
     """  Handles for received messages """
-
-
+    server = None
+    client = None
+    fileName = ""
+    timer = 0
 
     def __init__(self):
         self.name = ""
@@ -64,14 +66,10 @@ class Command:
         self.m_Commands["uninstall"] = self.download
         self.m_Commands["update"] = self.download
         self.m_Commands["download"] = self.download
-        self.fileName = ""
-        self.timer = 0
-        self.server = None
-        self.client = None
 
     def set_websocket(self, server, clients):
-        self.server = server
-        self.client = clients
+        Command.server = server
+        Command.client = clients
 
     def new_command(self, command):
         self.parsed_command = str(command).split()
@@ -147,20 +145,20 @@ class Command:
             eprintlog(e.read())
             packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
             packet.path = self.fileName
-            self.server.send_message(self.client, packet.toJSON())
+            Command.server.send_message(Command.client, packet.toJSON())
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
                 packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = url
-                self.server.send_message(self.client, packet.toJSON())
+                Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = url
-                self.server.send_message(self.client, packet.toJSON())
+                Command.server.send_message(Command.client, packet.toJSON())
         else:
             threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
         return
@@ -170,17 +168,16 @@ class Command:
         readsofar = blocknum * blocksize
         if totalsize > 0:
             percent = readsofar * 1e2 / totalsize
-
             currenttimer = int(round(time.time() * 1000))
             if currenttimer > self.timer + 500:
                 self.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = self.fileName
-                self.server.send_message(self.client, packet.toJSON())
+                Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
                 packet.path = self.fileName
-                self.server.send_message(self.client, packet.toJSON())
+                Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
