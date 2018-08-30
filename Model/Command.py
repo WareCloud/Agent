@@ -141,7 +141,7 @@ class Command:
 
     @staticmethod
     def reporthook(blocknum, blocksize, totalsize):
-        sleep(0.05)
+        sleep(0.5)
         readsofar = blocknum * blocksize
         if totalsize > 0:
             percent = readsofar * 1e2 / totalsize

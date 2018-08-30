@@ -38,6 +38,7 @@ WARECLOUD = "///////////////////////////\n" \
 
 
 
+
 # Called for every client connecting (after handshake)
 def new_client(client, server):
     softwareInfo = SoftwareInfo()
