@@ -20,6 +20,7 @@ from urllib.request import urlretrieve
 
 from Model.copytree import copytree
 from Model.Installer import *
+from time import sleep
 
 LINUX = "Linux"
 WINDOWS = "Windows"
@@ -140,6 +141,7 @@ class Command:
 
     @staticmethod
     def reporthook(blocknum, blocksize, totalsize):
+        sleep(0.05)
         readsofar = blocknum * blocksize
         if totalsize > 0:
             percent = readsofar * 1e2 / totalsize
