@@ -79,11 +79,12 @@ class PacketId:
 
 class PacketError:
 
-    def __init__(self, cmd, type, id):
+    def __init__(self, cmd, type, id, software_name=""):
         self.id = id
         self.command = cmd
         self.type = type
         self.path = os.path.dirname(os.path.abspath(__file__))
+        self.name = software_name
 
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)

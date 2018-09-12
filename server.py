@@ -64,7 +64,7 @@ def message_received(client, server, message):
             eprintlog(">> Server MSG:", packet.type, packet.command)
             server.send_message(client, packet.toJSON())
     else:
-        packet = PacketError(m_Command.parsed_command[0], Enum.PACKET_ERROR, PacketType.UNKN_CMD)
+        packet = PacketError(message, Enum.PACKET_ERROR, PacketType.UNKN_CMD)
         eprintlog(">> Server MSG: " + PacketType.UNKN_CMD, Enum.PACKET_ERROR)
         server.send_message(client, packet.toJSON())
 

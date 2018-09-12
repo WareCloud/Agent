@@ -19,9 +19,14 @@ import threading
 from urllib.request import urlretrieve
 from urllib.error import URLError
 import urllib
+
+from django.core.exceptions import ImproperlyConfigured
+
 from Model.copytree import copytree
 from Model.Installer import *
 import time
+import json
+from collections import namedtuple
 
 LINUX = "Linux"
 WINDOWS = "Windows"
@@ -48,7 +53,6 @@ class Command:
     timer = 0
 
     def __init__(self):
-        self.name = ""
         self.version = ""
         self.file_name = ""
         self.l_installer = Installer()
@@ -69,45 +73,42 @@ class Command:
 
     """ Parsing Commands """
     def new_command(self, command):
-        self.parsed_command = str(command).split()
+        try:
+            self.parsed_command = json.loads(command, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
+        except json.JSONDecodeError as e:
+                eprintlog(format(str(e)))
+        else:
+            eprintlog(self.parsed_command)
+
 
     """  Check if the Command is valid """
     def is_valid_command(self):
-        for l_command in self.m_Commands:
-            if l_command == self.parsed_command[0]:
-                return True
+        if hasattr(self.parsed_command, 'command'):
+            for l_command in self.m_Commands:
+                if l_command == self.parsed_command.command:
+                    return True
 
         return False
 
     """  Execute Command """
+    """             Name            [Commande]         [link]           [File_register] """
+    """  Example:   Mozilla          install        path/to/mozilla/       Firefox.exe """
     def run(self):
-        if self.parsed_command[0] == "install":
-            return self.install(self.parsed_command[1])
-        if self.parsed_command[0] == "uninstall":
-            return self.uninstall(self.parsed_command[1])
-        if self.parsed_command[0] == "follow":
-            return self.follow(self.parsed_command[1])
-        if self.parsed_command[0] == "download":
-            return self.download(self.parsed_command[1], self.parsed_command[2])
-        if self.parsed_command[0] == "configure":
-            return self.configure(self.parsed_command[1])
-        if self.parsed_command[0] == "download_cfg":
-            return self.download_cfg(self.parsed_command[1], self.parsed_command[2])
+        return self.m_Commands[self.parsed_command.command]()
 
 
     """  Follow Process """
-    def follow(self, name):
-        status = self.l_installer.follower(name)
+    def follow(self):
+        status = self.l_installer.follower(self.parsed_command.name)
         if status == "running":
-            packet = PacketError(self.parsed_command[0], PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
+            packet = PacketError(self.parsed_command.command, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
         else:
-            packet = PacketError(self.parsed_command[0], PacketType.F_FINISH, Enum.PACKET_FOLLOW)
-
-        packet.path = name
+            packet = PacketError(self.parsed_command.command, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
+        packet.path = self.link
         return packet
 
     """  Configuration Software """
-    def configure(self, name):
+    def configure(self):
 
         import tarfile
         if name.endswith("tar.gz"):
@@ -120,12 +121,12 @@ class Command:
         #if name == Chrome:
         #    copytree('configuration\\Google', ConfigurationFolderChrome)
 
-        packet = PacketError(self.parsed_command[0], PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
-        packet.path = name + '.exe'
+        packet = PacketError(self.parsed_command.command, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
+        packet.path = self.parsed_command.software.name
         return packet
 
     """  Installation Software """
-    def install(self, name):
+    def install(self):
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
@@ -133,7 +134,7 @@ class Command:
         return
 
     """  Uninstallation Software """
-    def uninstall(self, name):
+    def uninstall(self):
         self.l_installer.init(name)
         t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))
         threads.append(t)
@@ -169,31 +170,49 @@ class Command:
         return
 
     """  Download Configure """
-    def download_cfg(self, url, file_name):
-        self.fileName = file_name
+    """{
+    {
+     "command": "download_cfg",
+     "software": {
+       "name": "Firefox",
+       "file": "Firefox.exe",
+       "path": "AppData/Mozilla/Firefox",
+       "url": "https://url/download/cfg"
+       "extension": "tgz"
+     }
+    }
+    """
+    def download_cfg(self):
         try:
-            urllib.request.urlopen(url)
+            urllib.request.urlopen(self.parsed_command.software.url)
+
+
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
             packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-            packet.path = self.fileName
+            packet.path = self.parsed_command.software.name
             Command.server.send_message(Command.client, packet.toJSON())
+
+
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
                 packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = url
+                packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = url
+                packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
+
+
         else:
-            threading.Thread(target=urlretrieve, args=(url, 'configure/' + file_name, self.reporthook_cfg)).start()
+            threading.Thread(target=urlretrieve, args=(self.parsed_command.software.url,
+                                                       'configuration/' + self.parsed_command.software.name + self.parsed_command.software.extension, self.reporthook_cfg)).start()
         return
 
     def reporthook(self, blocknum, blocksize, totalsize):
@@ -204,12 +223,12 @@ class Command:
             if currenttimer > self.timer + 500:
                 self.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.fileName
+                packet.path = self.parsed_command.software.name
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.fileName
+                packet.path = self.parsed_command.software.name
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
@@ -222,12 +241,12 @@ class Command:
             if currenttimer > self.timer + 500:
                 self.timer = currenttimer
                 packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = self.fileName
+                packet.path = self.parsed_command.software.name
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = self.fileName
+                packet.path = self.parsed_command.software.name
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
