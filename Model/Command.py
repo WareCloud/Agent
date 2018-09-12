@@ -60,7 +60,7 @@ class Command:
         self.m_Commands = dict()
         self.m_Commands["install"] = self.install
         self.m_Commands["follow"] = self.follow
-        self.m_Commands["configure"] = self.download
+        self.m_Commands["configure"] = self.configure
         self.m_Commands["uninstall"] = self.uninstall
         self.m_Commands["update"] = self.download
         self.m_Commands["download"] = self.download
@@ -110,19 +110,17 @@ class Command:
 
     """  Configuration Software """
     def configure(self):
-
-        import tarfile
-        if self.parsed_command.software.file.endswith("tar.gz"):
-            tar = tarfile.open(name, "r:gz")
-            tar.extractall()
+        if self.parsed_command.software.extension == "tar.gz" or self.parsed_command.software.extension == "tgz":
+            tar = tarfile.open('configuration\\' + self.parsed_command.software.file, "r:gz")
+            tar.extractall('configuration\\' + self.parsed_command.software.name)
             tar.close()
-            copytree('configuration\\' + name, ConfigurationFolder + name)
+            copytree('configuration\\' + self.parsed_command.software.name, ConfigurationFolder + self.parsed_command.software.path)
 
         #Chrome is now removed
         #if name == Chrome:
         #    copytree('configuration\\Google', ConfigurationFolderChrome)
 
-        packet = PacketError(self.parsed_command.file, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION, self.parsed_command.software.name)
+        packet = PacketError(self.parsed_command.software.file, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION, self.parsed_command.software.name)
         packet.path = self.parsed_command.software.path
         return packet
 
@@ -184,18 +182,15 @@ class Command:
     }
     """
     def download_cfg(self):
+        self.fileName = self.parsed_command.software.file
         try:
             urllib.request.urlopen(self.parsed_command.software.url)
-
-
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
             packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
             packet.path = self.parsed_command.software.path
             Command.server.send_message(Command.client, packet.toJSON())
-
-
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
@@ -209,11 +204,9 @@ class Command:
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG, self.parsed_command.software.name)
                 packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
-
-
         else:
             threading.Thread(target=urlretrieve, args=(self.parsed_command.software.url,
-                                                       'configuration/' + self.parsed_command.software.name + self.parsed_command.software.extension, self.reporthook_cfg)).start()
+                                                       'configuration/' + self.parsed_command.software.file, self.reporthook_cfg)).start()
         return
 
     def reporthook(self, blocknum, blocksize, totalsize):
