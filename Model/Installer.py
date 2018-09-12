@@ -14,32 +14,30 @@ from Model.SoftwareInfo import *
 class Installer:
 
     def __init__(self):
-        self.name = ""
+        self.software = ""
         self.path = "./install"
 
     def init(self, p_name):
         Logger.__call__().get_logger().info("Installer: INITIALISATION")
-        self.name = p_name
+        self.software = p_name
 
     def install(self, server, client):
-        installer = "install\\" + self.name
-        print(installer)
+        installer = "install\\" + self.software.file
         try:
-            if self.name == "Chrome.exe":
+            if self.software.file == "Chrome.exe":
                 subprocess.check_call(installer + " /silent /install", shell=True)
             else:
                 subprocess.check_call(installer + " /S", shell=True)
         except subprocess.CalledProcessError as e:
             Logger.__call__().get_logger().debug(e)
-            server.send_message(client, PacketError(self.name, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL).toJSON())
+            server.send_message(client, PacketError(self.software.file, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL, self.software.name).toJSON())
             return  # handle errors in the called executable
         except OSError as e:
             Logger.__call__().get_logger().debug(e.filename + " " + e.errno + " " + e.strerror)
-            server.send_message(client, PacketError(self.name, PacketType.FAILED_FIND_INSTALLER, Enum.PACKET_INSTALL).toJSON())
+            server.send_message(client, PacketError(self.software.file, PacketType.FAILED_FIND_INSTALLER, Enum.PACKET_INSTALL, self.software.name).toJSON())
             return # executable not found
 
-        print(PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
-        server.send_message(client, PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_INSTALL).toJSON())
+        server.send_message(client, PacketError(self.software.file, PacketType.OK_INSTALL, Enum.PACKET_INSTALL, self.software.name).toJSON())
         return True
 
     def uninstall(self, server, client):
@@ -48,22 +46,24 @@ class Installer:
         call = ''
 
         for x in softwares.arraySoft:
-            if x.name.find(self.name) != -1:
+            if x.name.find(self.software.file) != -1:
                 call = x.uninstall
         try:
             subprocess.check_call(call, shell=True)
         except subprocess.CalledProcessError as e:
             Logger.__call__().get_logger().debug(e)
-            server.send_message(client, PacketError(self.name, PacketType.FAILED_UNINSTALL, Enum.PACKET_UNINSTALL).toJSON())
+            server.send_message(client, PacketError(self.software.file,
+                                                    PacketType.FAILED_UNINSTALL, Enum.PACKET_UNINSTALL, self.software.name).toJSON())
             return  # handle errors in the called executable
         except OSError as e:
             Logger.__call__().get_logger().debug(e.filename + " " + e.errno + " " + e.strerror)
             server.send_message(client,
-            PacketError(self.name, PacketType.FAILED_FIND_UNINSTALLER, Enum.PACKET_UNINSTALL).toJSON())
+            PacketError(self.software.file,
+                        PacketType.FAILED_FIND_UNINSTALLER, Enum.PACKET_UNINSTALL, self.software.name).toJSON())
             return  # executable not found
 
-        print(PacketError(self.name, PacketType.OK_INSTALL, Enum.PACKET_UNINSTALL).toJSON())
-        server.send_message(client, PacketError(self.name, PacketType.OK_UNINSTALL, Enum.PACKET_UNINSTALL).toJSON())
+        server.send_message(client, PacketError(self.software.file,
+                                                PacketType.OK_UNINSTALL, Enum.PACKET_UNINSTALL, self.software.name).toJSON())
         return True
 
     def follower(self, name):

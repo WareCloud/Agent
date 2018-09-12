@@ -127,7 +127,7 @@ class Command:
 
     """  Installation Software """
     def install(self):
-        self.l_installer.init(self.parsed_command.software.file)
+        self.l_installer.init(self.parsed_command.software)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
@@ -135,7 +135,7 @@ class Command:
 
     """  Uninstallation Software """
     def uninstall(self):
-        self.l_installer.init(self.parsed_command.software.file)
+        self.l_installer.init(self.parsed_command.software)
         t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
