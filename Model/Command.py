@@ -61,7 +61,7 @@ class Command:
         self.m_Commands["install"] = self.install
         self.m_Commands["follow"] = self.follow
         self.m_Commands["configure"] = self.download
-        self.m_Commands["uninstall"] = self.download
+        self.m_Commands["uninstall"] = self.uninstall
         self.m_Commands["update"] = self.download
         self.m_Commands["download"] = self.download
         self.m_Commands["download_cfg"] = self.download_cfg
