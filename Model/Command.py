@@ -101,9 +101,9 @@ class Command:
     def follow(self):
         status = self.l_installer.follower(self.parsed_command.name)
         if status == "running":
-            packet = PacketError(self.parsed_command.command, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
+            packet = PacketError(self.parsed_command.command, PacketType.F_RUNNING, Enum.PACKET_FOLLOW, self.parsed_command.name)
         else:
-            packet = PacketError(self.parsed_command.command, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
+            packet = PacketError(self.parsed_command.command, PacketType.F_FINISH, Enum.PACKET_FOLLOW, self.parsed_command.name)
         packet.path = self.software.path
         return packet
 
@@ -149,21 +149,21 @@ class Command:
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
-            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-            packet.path = self.fileName
+            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
+            packet.path = self.parsed_command.software.path
             Command.server.send_message(Command.client, packet.toJSON())
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
-                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.software.url
+                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
-                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.software.url
+                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
         else:
             threading.Thread(target=urlretrieve, args=(self.parsed_command.software.url, 'install/' + self.parsed_command.software.file, self.reporthook)).start()
@@ -190,8 +190,8 @@ class Command:
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
-            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-            packet.path = self.parsed_command.software.name
+            packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
+            packet.path = self.parsed_command.software.path
             Command.server.send_message(Command.client, packet.toJSON())
 
 
@@ -199,13 +199,13 @@ class Command:
             if hasattr(urlerror, 'reason'):
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
-                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
+                packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG, self.parsed_command.software.name)
                 packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
-                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG)
+                packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE_CFG, self.parsed_command.software.name)
                 packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
 
@@ -222,13 +222,13 @@ class Command:
             currenttimer = int(round(time.time() * 1000))
             if currenttimer > self.timer + 500:
                 self.timer = currenttimer
-                packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.software.name
+                packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
                 packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.software.name
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
@@ -240,13 +240,13 @@ class Command:
             currenttimer = int(round(time.time() * 1000))
             if currenttimer > self.timer + 500:
                 self.timer = currenttimer
-                packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = self.parsed_command.software.name
+                packet = PacketError(percent, PacketType.F_RUNNING, Enum.PACKET_DOWNLOAD_STATE_CFG, self.parsed_command.software.name)
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
-                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE_CFG)
-                packet.path = self.parsed_command.software.name
+                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE_CFG, self.parsed_command.software.name)
+                packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
             sys.stderr.write("read %d\n" % (readsofar,))
