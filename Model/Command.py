@@ -111,7 +111,7 @@ class Command:
     def configure(self):
 
         import tarfile
-        if name.endswith("tar.gz"):
+        if self.parsed_command.name.endswith("tar.gz"):
             tar = tarfile.open(name, "r:gz")
             tar.extractall()
             tar.close()
@@ -127,7 +127,7 @@ class Command:
 
     """  Installation Software """
     def install(self):
-        self.l_installer.init(name)
+        self.l_installer.init(self.parsed_command.file)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
@@ -135,7 +135,7 @@ class Command:
 
     """  Uninstallation Software """
     def uninstall(self):
-        self.l_installer.init(name)
+        self.l_installer.init(self.parsed_command.file)
         t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
@@ -143,7 +143,7 @@ class Command:
 
     """  Download Software """
     def download(self, url, file_name):
-        self.fileName = file_name
+        self.fileName = self.parsed_command.file
         try:
             urllib.request.urlopen(url)
         except urllib.error.HTTPError as e:
