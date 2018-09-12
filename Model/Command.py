@@ -101,9 +101,9 @@ class Command:
     def follow(self):
         status = self.l_installer.follower(self.parsed_command.software.file)
         if status == "running":
-            packet = PacketError(self.parsed_command.file, PacketType.F_RUNNING, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
+            packet = PacketError(self.parsed_command.software.file, PacketType.F_RUNNING, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
         else:
-            packet = PacketError(self.parsed_command.file, PacketType.F_FINISH, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
+            packet = PacketError(self.parsed_command.software.file, PacketType.F_FINISH, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
         packet.path = self.software.path
         return packet
 
@@ -121,8 +121,8 @@ class Command:
         #if name == Chrome:
         #    copytree('configuration\\Google', ConfigurationFolderChrome)
 
-        packet = PacketError(self.parsed_command.command, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION)
-        packet.path = self.parsed_command.software.name
+        packet = PacketError(self.parsed_command.file, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION, self.parsed_command.software.name)
+        packet.path = self.parsed_command.software.path
         return packet
 
     """  Installation Software """
