@@ -104,14 +104,14 @@ class Command:
             packet = PacketError(self.parsed_command.command, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
         else:
             packet = PacketError(self.parsed_command.command, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
-        packet.path = self.link
+        packet.path = self.software.path
         return packet
 
     """  Configuration Software """
     def configure(self):
 
         import tarfile
-        if self.parsed_command.name.endswith("tar.gz"):
+        if self.parsed_command.software.name.endswith("tar.gz"):
             tar = tarfile.open(name, "r:gz")
             tar.extractall()
             tar.close()
@@ -127,7 +127,7 @@ class Command:
 
     """  Installation Software """
     def install(self):
-        self.l_installer.init(self.parsed_command.file)
+        self.l_installer.init(self.parsed_command.software.file)
         t = threading.Thread(target=self.l_installer.install, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
@@ -135,7 +135,7 @@ class Command:
 
     """  Uninstallation Software """
     def uninstall(self):
-        self.l_installer.init(self.parsed_command.file)
+        self.l_installer.init(self.parsed_command.software.file)
         t = threading.Thread(target=self.l_installer.uninstall, args=(Command.server, Command.client))
         threads.append(t)
         t.start()
@@ -143,9 +143,9 @@ class Command:
 
     """  Download Software """
     def download(self):
-        self.fileName = self.parsed_command.file
+        self.fileName = self.parsed_command.software.file
         try:
-            urllib.request.urlopen(self.parsed_command.url)
+            urllib.request.urlopen(self.parsed_command.software.url)
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
@@ -157,16 +157,16 @@ class Command:
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
                 packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.url
+                packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = self.parsed_command.url
+                packet.path = self.parsed_command.software.url
                 Command.server.send_message(Command.client, packet.toJSON())
         else:
-            threading.Thread(target=urlretrieve, args=(self.parsed_command.url, 'install/' + self.parsed_command.file, self.reporthook)).start()
+            threading.Thread(target=urlretrieve, args=(self.parsed_command.software.url, 'install/' + self.parsed_command.software.file, self.reporthook)).start()
         return
 
     """  Download Configure """
