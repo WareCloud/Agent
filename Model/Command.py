@@ -99,7 +99,7 @@ class Command:
 
     """  Follow Process """
     def follow(self):
-        status = self.l_installer.follower(self.parsed_command.name)
+        status = self.l_installer.follower(self.parsed_command.file)
         if status == "running":
             packet = PacketError(self.parsed_command.command, PacketType.F_RUNNING, Enum.PACKET_FOLLOW, self.parsed_command.name)
         else:
@@ -111,7 +111,7 @@ class Command:
     def configure(self):
 
         import tarfile
-        if self.parsed_command.software.name.endswith("tar.gz"):
+        if self.parsed_command.software.file.endswith("tar.gz"):
             tar = tarfile.open(name, "r:gz")
             tar.extractall()
             tar.close()
@@ -227,7 +227,7 @@ class Command:
                 Command.server.send_message(Command.client, packet.toJSON())
 
             if readsofar >= totalsize:  # near the end
-                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE)
+                packet = PacketError(percent, PacketType.F_FINISH, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
                 packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
         else:  # total size is unknown
