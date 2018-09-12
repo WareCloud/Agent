@@ -142,10 +142,10 @@ class Command:
         return
 
     """  Download Software """
-    def download(self, url, file_name):
+    def download(self):
         self.fileName = self.parsed_command.file
         try:
-            urllib.request.urlopen(url)
+            urllib.request.urlopen(self.parsed_command.url)
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
@@ -157,16 +157,16 @@ class Command:
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
                 packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = url
+                packet.path = self.parsed_command.url
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE)
-                packet.path = url
+                packet.path = self.parsed_command.url
                 Command.server.send_message(Command.client, packet.toJSON())
         else:
-            threading.Thread(target=urlretrieve, args=(url, 'install/' + file_name, self.reporthook)).start()
+            threading.Thread(target=urlretrieve, args=(self.parsed_command.url, 'install/' + self.parsed_command.file, self.reporthook)).start()
         return
 
     """  Download Configure """
