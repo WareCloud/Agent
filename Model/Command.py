@@ -104,7 +104,6 @@ class Command:
             packet = PacketError(self.parsed_command.software.file, PacketType.F_RUNNING, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
         else:
             packet = PacketError(self.parsed_command.software.file, PacketType.F_FINISH, Enum.PACKET_FOLLOW, self.parsed_command.software.name)
-        packet.path = self.software.path
         return packet
 
     """  Configuration Software """
