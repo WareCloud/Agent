@@ -19,6 +19,7 @@
 
 import ssl
 import ctypes, sys
+import urllib.request
 from optparse import OptionParser
 from Model.Configuration import Configuration
 from Model.Packet import Enum, PacketType
@@ -93,6 +94,10 @@ if __name__ == "__main__":
         f.write("")
         f.close()
         eprintlog(WARECLOUD)
+
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36')]
+        urllib.request.install_opener(opener)
 
         eprintlog(">> Configuration de l'agent ...")
         l_configuration = Configuration()
