@@ -1,12 +1,27 @@
+#!/usr/bin/env python3
+# title				: server.py
+# description		: Unitary Test
+# author			: Cloquet Alban
+# date				: 2017/06/19
+# version			: Python 3.6
+# usage				: UT
+# notes				:
+# python_version	: 3.6
+# ==============================================================================
+
+# ////////////////////////////////////////////////////////////////////////////////
+# //
+# //  WARECLOUD
+# //
+# ////////////////////////////////////////////////////////////////////////////////
+
 import unittest
 from Model.Command import *
-
-command = Command()
-
 
 class ServerTest(unittest.TestCase):
 
     def test_set_websocket(self):
+        command = Command()
         server = 1
         client = 2
         command.set_websocket(server, client)
@@ -14,39 +29,39 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(command.client, client)
 
     def test_new_command(self):
-        string ="ceci est un test unitaire"
-        tab = ["ceci", "est", "un", "test", "unitaire"]
-        command.new_command(string)
-        self.assertEqual(tab[0], command.parsed_command[0])
-        self.assertEqual(tab[1], command.parsed_command[1])
-        self.assertEqual(tab[2], command.parsed_command[2])
-        self.assertEqual(tab[3], command.parsed_command[3])
-        self.assertEqual(tab[4], command.parsed_command[4])
+        command = Command()
+        name = '{"command":"follow","software":{"name":"System","file":"System.exe","url":null,"path":null,"extension":null}}'
+        command.new_command(name)
+        self.assertEqual("follow", command.parsed_command.command)
+        self.assertEqual("System", command.parsed_command.software.name)
 
     def test_is_valid_command(self):
+        command = Command()
         string = "ceci est un test unitaire"
         command.new_command(string)
         self.assertEqual(False, command.is_valid_command())
 
-        string = "install chrome.exe"
+        string = '{"command":"follow","software":{"name":"System","file":"System.exe","url":null,"path":null,"extension":null}}'
         command.new_command(string)
         self.assertEqual(True, command.is_valid_command())
 
     def test_follow(self):
-        name = "follow System"
+        command = Command()
+        name = '{"command":"follow","software":{"name":"System","file":"slack.exe","url":null,"path":null,"extension":null}}'
         command.new_command(name)
-        packet = PacketError(name, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
-        value = command.follow("System")
+        packet = PacketError(command.parsed_command.software.file, PacketType.F_RUNNING, Enum.PACKET_FOLLOW)
+        value = command.follow()
         self.assertEqual(packet.id, value.id)
-        self.assertEqual("follow", value.command)
+        self.assertEqual("slack.exe", value.command)
         self.assertEqual(packet.type, value.type)
 
-        name = "follow toto.exe"
+        command = Command()
+        name = '{"command":"follow","software":{"name":"Toto","file":"Toto.exe","url":null,"path":null,"extension":null}}'
         command.new_command(name)
-        packet = PacketError(name, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
-        value = command.follow("toto.exe")
+        packet = PacketError(command.parsed_command.software.file, PacketType.F_FINISH, Enum.PACKET_FOLLOW)
+        value = command.follow()
         self.assertEqual(packet.id, value.id)
-        self.assertEqual("follow", value.command)
+        self.assertEqual("Toto.exe", value.command)
         self.assertEqual(packet.type, value.type)
 
 
