@@ -29,6 +29,14 @@ from Model import Command
 from Model.SoftwareInfo import SoftwareInfo
 from Model.Logger import *
 
+# To compile notification with python
+import appdirs
+from packaging import version
+from packaging import specifiers
+from packaging import requirements
+from packaging import markers
+# ====================================
+
 PORT = 8000
 CONFIGURATION = "configuration"
 INSTALL = "install"
@@ -36,7 +44,6 @@ WARECLOUD = "///////////////////////////\n" \
             "/////////WARECLOUD/////////\n" \
             "///////////AGENT///////////\n" \
             "///////////////////////////\n"
-
 
 
 

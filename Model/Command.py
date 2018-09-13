@@ -26,22 +26,14 @@ import time
 import json
 from collections import namedtuple
 
+
 LINUX = "Linux"
 WINDOWS = "Windows"
 
 threads = []
 m_bool = False
 ConfigurationPath = "%AppData%/"
-
-TeamViewer = "TeamViewer"
-Slack = "Slack"
-Firefox = "Mozilla"
-NotePad = "Notepad++"
 ConfigurationFolder = "C:\\Users\\%s\\AppData\\Roaming\\" % (getpass.getuser())
-
-#Chrome = "Chrome"
-#ConfigurationFolderChrome = "C:\\Users\\" + getpass.getuser() + "\\AppData\\Local\\"
-#GoogleChrome = "chrome.exe"
 
 class Command:
     """  Handles for received messages """
@@ -71,6 +63,19 @@ class Command:
         Command.client = clients
 
     """ Parsing Commands """
+    """{
+       {
+        "command": "download_cfg",
+        "software": {
+          "name": "Firefox",
+          "file": "Firefox.exe",
+          "path": "AppData/Mozilla/Firefox",
+          "url": "https://url/download/cfg"
+          "extension": "tgz"
+        }
+       }
+       """
+
     def new_command(self, command):
         try:
             self.parsed_command = json.loads(command, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
@@ -90,8 +95,6 @@ class Command:
         return False
 
     """  Execute Command """
-    """             Name            [Commande]         [link]           [File_register] """
-    """  Example:   Mozilla          install        path/to/mozilla/       Firefox.exe """
     def run(self):
         return self.m_Commands[self.parsed_command.command]()
 
@@ -114,10 +117,6 @@ class Command:
             tar.extractall('configuration\\' + self.parsed_command.software.name)
             tar.close()
             copytree('configuration\\' + self.parsed_command.software.name, ConfigurationFolder + self.parsed_command.software.path)
-
-        #Chrome is now removed
-        #if name == Chrome:
-        #    copytree('configuration\\Google', ConfigurationFolderChrome)
 
         packet = PacketError(self.parsed_command.software.file, PacketType.OK_CONFIGURATION, Enum.PACKET_CONFIGURATION, self.parsed_command.software.name)
         packet.path = self.parsed_command.software.path
@@ -171,18 +170,6 @@ class Command:
         return
 
     """  Download Configure """
-    """{
-    {
-     "command": "download_cfg",
-     "software": {
-       "name": "Firefox",
-       "file": "Firefox.exe",
-       "path": "AppData/Mozilla/Firefox",
-       "url": "https://url/download/cfg"
-       "extension": "tgz"
-     }
-    }
-    """
     def download_cfg(self):
         self.fileName = self.parsed_command.software.file
         try:

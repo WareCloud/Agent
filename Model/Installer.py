@@ -6,9 +6,12 @@
 
 import subprocess
 import psutil
+import time
+
 from Model.Packet import *
 from Model.Logger import *
 from Model.SoftwareInfo import *
+from win10toast import ToastNotifier
 
 
 class Installer:
@@ -38,6 +41,12 @@ class Installer:
             return # executable not found
 
         server.send_message(client, PacketError(self.software.file, PacketType.OK_INSTALL, Enum.PACKET_INSTALL, self.software.name).toJSON())
+
+        toaster = ToastNotifier()
+        toaster.show_toast("Warecloud Agent", self.software.name + " successfully installed !",
+                           icon_path="brand-small.ico",
+                           duration=2, threaded=True)
+        while toaster.notification_active(): time.sleep(0.1)
         return True
 
     def uninstall(self, server, client):
@@ -76,7 +85,6 @@ class Installer:
                 if p.name():
                     eprint(p.name())
 
-                eprint("statut follow : " + statut)
                 if p.name() == name:
                     eprint("Found!")
                     process = p
@@ -84,7 +92,6 @@ class Installer:
                     if str(statut) == "running":
                         return str(statut)
 
-        eprint("statut follow : " + statut)
         return statut
 
 
