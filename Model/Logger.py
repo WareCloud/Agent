@@ -58,4 +58,10 @@ def eprint(*args, **kwargs):
 
 def eprintlog(*args, **kwargs):
     print(*args, file=sys.stdout, **kwargs)
-    print(*args, file=open("AgentWareCloud.log", "a"), **kwargs)
+    try:
+        file = open("AgentWareCloud.log", "a")
+    except IOError:
+        return
+    else:
+        file.close()
+        print(*args, file=open("AgentWareCloud.log", "a"), **kwargs)
