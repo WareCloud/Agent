@@ -12,6 +12,8 @@ WareCloud: Agent (0.1) Beta
 
 ## Install requirements
 pip install -r requirements.txt
+pip install appdirs
+pip install packaging
 
 ## Run
 
