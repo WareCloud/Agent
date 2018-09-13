@@ -14,14 +14,12 @@
 # //  WARECLOUD
 # //
 # ////////////////////////////////////////////////////////////////////////////////
+
 import tarfile
 import threading
 from urllib.request import urlretrieve
 from urllib.error import URLError
 import urllib
-
-from django.core.exceptions import ImproperlyConfigured
-
 from Model.copytree import copytree
 from Model.Installer import *
 import time
@@ -53,6 +51,7 @@ class Command:
     timer = 0
 
     def __init__(self):
+        self.logger = Logger.__call__().get_logger()
         self.version = ""
         self.file_name = ""
         self.l_installer = Installer()
@@ -77,9 +76,9 @@ class Command:
             self.parsed_command = json.loads(command, object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))
         except json.JSONDecodeError as e:
                 eprintlog(format(str(e)))
+                self.logger.debug(format(str(e)))
         else:
-            eprintlog(self.parsed_command)
-
+            self.logger.info(self.parsed_command)
 
     """  Check if the Command is valid """
     def is_valid_command(self):
@@ -148,17 +147,20 @@ class Command:
         except urllib.error.HTTPError as e:
             eprintlog(e.code)
             eprintlog(e.read())
+            self.logger.debug(format(str(e)))
             packet = PacketError(e.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
             packet.path = self.parsed_command.software.path
             Command.server.send_message(Command.client, packet.toJSON())
         except URLError as urlerror:
             if hasattr(urlerror, 'reason'):
+                self.logger.debug(format(str(e)))
                 eprintlog('We failed to reach a server.')
                 eprintlog('Reason: ', urlerror.reason)
                 packet = PacketError(urlerror.reason, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
                 packet.path = self.parsed_command.software.path
                 Command.server.send_message(Command.client, packet.toJSON())
             elif hasattr(urlerror, 'code'):
+                self.logger.debug(format(str(e)))
                 eprintlog('The server couldn\'t fulfill the request.')
                 eprintlog('Error code: ', urlerror.code)
                 packet = PacketError(urlerror.code, PacketType.FAILED_DOWNLOAD, Enum.PACKET_DOWNLOAD_STATE, self.parsed_command.software.name)
