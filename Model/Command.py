@@ -98,6 +98,9 @@ class Command:
     def run(self):
         return self.m_Commands[self.parsed_command.command]()
 
+    """ Ping """
+    def ping(self):
+        return PacketError(self.parsed_command.command, PacketType.PING, Enum.PACKET_PING)
 
     """  Follow Process """
     def follow(self):
