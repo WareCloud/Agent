@@ -17,6 +17,7 @@
 
 import unittest
 from Model.Command import *
+from Model.Configuration import *
 
 class ServerTest(unittest.TestCase):
 
@@ -63,6 +64,29 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(packet.id, value.id)
         self.assertEqual("Toto.exe", value.command)
         self.assertEqual(packet.type, value.type)
+
+    def test_installer_init(self):
+        installer = Installer()
+        installer.init("test_installer")
+        self.assertEqual("test_installer", installer.software)
+
+    def test_installer_install_failed(self):
+        installer = Installer()
+        installer.init("test_installer")
+      #  self.assertEqual(False, installer.install(0, 0))
+
+class ConfigutationTest(unittest.TestCase):
+
+    def test_create_directory(self):
+        conf = Configuration()
+        conf.create_directory("test_unit_directory")
+        files = [f for f in os.listdir('.')]
+        test = False
+        for f in files:
+            if f == "test_unit_directory":
+                test = True
+
+        self.assertEqual(True, test)
 
 
 if __name__ == "__main__":

@@ -13,10 +13,10 @@ setup(
     version='0.1',
     options={'build.exe': {'include_files': include_files,
                            "icon": "brand-small.ico"}},
-    executables=[Executable("server.py", base=base)],
+    executables=[Executable("server.py", base=base, icon='brand-small.ico')],
     url='https://github.com/WareCloud/Agent',
     license='Warecloud',
     author='Cloquet Alban',
-    author_email='clouqet.alban@epitech.eu',
+    author_email='cloquet.alban@epitech.eu',
     description='AgentWarecloud'
 )

@@ -51,6 +51,7 @@ class Command:
         self.m_Commands = dict()
         self.m_Commands["install"] = self.install
         self.m_Commands["follow"] = self.follow
+        self.m_Commands["ping"] = self.ping
         self.m_Commands["configure"] = self.configure
         self.m_Commands["uninstall"] = self.uninstall
         self.m_Commands["update"] = self.download

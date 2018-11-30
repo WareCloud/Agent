@@ -34,11 +34,11 @@ class Installer:
         except subprocess.CalledProcessError as e:
             Logger.__call__().get_logger().debug(e)
             server.send_message(client, PacketError(self.software.file, PacketType.FAILED_INSTALL, Enum.PACKET_INSTALL, self.software.name).toJSON())
-            return  # handle errors in the called executable
+            return False# handle errors in the called executable
         except OSError as e:
             Logger.__call__().get_logger().debug(e.filename + " " + e.errno + " " + e.strerror)
             server.send_message(client, PacketError(self.software.file, PacketType.FAILED_FIND_INSTALLER, Enum.PACKET_INSTALL, self.software.name).toJSON())
-            return # executable not found
+            return False# executable not found
 
         server.send_message(client, PacketError(self.software.file, PacketType.OK_INSTALL, Enum.PACKET_INSTALL, self.software.name).toJSON())
 
@@ -47,6 +47,10 @@ class Installer:
                            icon_path="brand-small.ico",
                            duration=2, threaded=True)
         while toaster.notification_active(): time.sleep(0.1)
+        softwareInfo = SoftwareInfo()
+        packet = PacketId()
+        packet.software = softwareInfo.get_all_software()
+        server.send_message(client, packet.toJSON())
         return True
 
     def uninstall(self, server, client):
@@ -58,7 +62,7 @@ class Installer:
             if x.name.find(self.software.file) != -1:
                 call = x.uninstall
         try:
-            subprocess.check_call(call, shell=True)
+            subprocess.check_call(call + " /S KEEP_CONFIG=0", shell=True)
         except subprocess.CalledProcessError as e:
             Logger.__call__().get_logger().debug(e)
             server.send_message(client, PacketError(self.software.file,
@@ -73,6 +77,15 @@ class Installer:
 
         server.send_message(client, PacketError(self.software.file,
                                                 PacketType.OK_UNINSTALL, Enum.PACKET_UNINSTALL, self.software.name).toJSON())
+        toaster = ToastNotifier()
+        toaster.show_toast("Warecloud Agent", self.software.name + " successfully uninstalled !",
+                           icon_path="brand-small.ico",
+                           duration=2, threaded=True)
+        while toaster.notification_active(): time.sleep(0.1)
+        softwareInfo = SoftwareInfo()
+        packet = PacketId()
+        packet.software = softwareInfo.get_all_software()
+        server.send_message(client, packet.toJSON())
         return True
 
     def follower(self, name):
@@ -82,9 +95,6 @@ class Installer:
         for x in list_pid:
             if psutil.pid_exists(x) is True:
                 p = psutil.Process(x)
-                if p.name():
-                    eprint(p.name())
-
                 if p.name() == name:
                     eprint("Found!")
                     process = p

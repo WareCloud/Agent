@@ -28,6 +28,8 @@ from websocket_server import WebsocketServer
 from Model import Command
 from Model.SoftwareInfo import SoftwareInfo
 from Model.Logger import *
+from win10toast import ToastNotifier
+import time
 
 # To compile notification with python
 import appdirs
@@ -83,6 +85,22 @@ def is_admin():
     except:
         return False
 
+
+def portIsOpen(port):
+    import socket, errno
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("0.0.0.0", int(port)))
+    except socket.error as e:
+        if e.errno == errno.EADDRINUSE:
+            Logger.__call__().get_logger().debug(e)
+        else:
+            Logger.__call__().get_logger().debug(e)
+        return False
+
+    s.close()
+    return True
+
 if __name__ == "__main__":
     if is_admin():
         parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
@@ -96,6 +114,7 @@ if __name__ == "__main__":
         parser.add_option("--gui", default=0, type='int', action="store", dest="gui", help="GUI ?")
         (options, args) = parser.parse_args()
 
+        """ Clean and create Log File """
         logger = Logger.__call__().get_logger()
         f = open("AgentWareCloud.log", "w")
         f.write("")
@@ -110,19 +129,28 @@ if __name__ == "__main__":
         l_configuration = Configuration()
         l_configuration.create_directory(CONFIGURATION)
         l_configuration.create_directory(INSTALL)
-        """ Lancement du serveur """
-        if options.debug == 0:
-            eprintlog(">> Lancement du serveur ...")
 
-        eprintlog(">> Running on port :[", PORT, "] ...")
-        server = WebsocketServer(8000, '0.0.0.0')
+        """ Start Server """
+        if portIsOpen(options.port) is False:
+            toaster = ToastNotifier()
+            toaster.show_toast("Warecloud Agent", "Another program is using port " + str(options.port),
+                               icon_path="brand-small.ico",
+                               duration=2, threaded=True)
+            while toaster.notification_active(): time.sleep(0.2)
+            exit(1)
+
+        eprintlog(">> Running on port :[", options.port, "] ...")
+        server = WebsocketServer(options.port, '0.0.0.0')
         server.set_fn_new_client(new_client)
         server.set_fn_client_left(client_left)
         server.set_fn_message_received(message_received)
         server.run_forever().start()
     else:
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, __file__, None, 1)
-
+        toaster = ToastNotifier()
+        toaster.show_toast("Warecloud Agent", "Run As Admin",
+                           icon_path="brand-small.ico",
+                           duration=2, threaded=True)
+        while toaster.notification_active(): time.sleep(0.2)
 
 
 
